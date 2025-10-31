@@ -1,0 +1,34 @@
+# --- Normalize line endings ---
+* text=auto eol=lf
+
+# --- Ensure Rust source files use LF ---
+*.rs text eol=lf
+
+# --- Mark binary files as non-diffable ---
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.exe binary
+*.dll binary
+*.dylib binary
+*.so binary
+
+# --- Preserve CRLF for Windows-specific scripts ---
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# --- Enforce LF for shell scripts ---
+*.sh text eol=lf
+
+# --- Treat Cargo.lock as text but don't auto-convert line endings ---
+Cargo.lock text eol=lf
+
+# --- Documentation and Markdown ---
+*.md text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
