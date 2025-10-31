@@ -7,7 +7,9 @@ Ryan Mia Len
 ## Names and Net IDs
 
 Ryan - ryanmz2
+
 Mia - mmarg
+
 Len - llivs
 
 ## Project Introduction
@@ -20,7 +22,6 @@ We are working on a live chat server that encrypts and stores messages. We want 
  - Authentication: Password based user authentication 
  - Local caching using JSON
  - SQL database for chat history storage
- - 
 
 ## Roadmap:
 1. Create a centralized server 
