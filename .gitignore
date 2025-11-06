@@ -1,0 +1,58 @@
+# --- Rust build artifacts ---
+/target/
+/debug/
+/release/
+
+# --- Cargo package manager ---
+Cargo.lock
+**/*.rs.bk
+
+# --- IDE and editor settings ---
+# VS Code
+.vscode/
+# IntelliJ / CLion / RustRover
+.idea/
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# --- OS-specific files ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Logs and temp files ---
+*.log
+*.tmp
+*.temp
+
+# --- Test & coverage output ---
+/coverage/
+/test-results/
+*.profraw
+*.profdata
+
+# --- Build tools and scripts ---
+/dist/
+/out/
+/bin/
+/build/
+
+# --- Environment & secrets ---
+.env
+.env.local
+.env.*
+
+# --- Backup / cache ---
+*.bak
+*.swp
+*.swo
+*.old
+.cache/
+target-old/
