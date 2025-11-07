@@ -1,0 +1,12 @@
+/Users/ryanzheng/Documents/CS 128 Intro to CS II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/deps/serde-ac84f163ca4ad259.d: /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/ryanzheng/Documents/CS\ 128\ Intro\ to\ CS\ II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/build/serde-30563a6247e80721/out/private.rs
+
+/Users/ryanzheng/Documents/CS 128 Intro to CS II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/deps/libserde-ac84f163ca4ad259.rmeta: /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/ryanzheng/Documents/CS\ 128\ Intro\ to\ CS\ II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/build/serde-30563a6247e80721/out/private.rs
+
+/Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/Users/ryanzheng/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/Users/ryanzheng/Documents/CS\ 128\ Intro\ to\ CS\ II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/build/serde-30563a6247e80721/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/ryanzheng/Documents/CS 128 Intro to CS II/Honors/CS199-128-Final-Project-FA25-/chat-server/target/debug/build/serde-30563a6247e80721/out

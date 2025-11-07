@@ -1,0 +1,1 @@
+axum::Json<Result<std::string::String, std::string::String>>

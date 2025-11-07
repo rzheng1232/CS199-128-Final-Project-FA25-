@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+rand = { version = "0.8", features = ["std", "getrandom"] } 
+argon2 ="0.5.3"
+axum = "0.8.6"
+sqlx = {version="0.8.6", features = ["sqlite", "runtime-tokio-rustls", "macros"]}
+tokio = { version = "1.48.0", features = ["full"] }
