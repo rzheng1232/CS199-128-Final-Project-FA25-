@@ -1,1 +1,7 @@
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s
+error: invalid table header
+duplicate key `dependencies` in document root
+ --> Cargo.toml:7:1
+  |
+7 | [dependencies]
+  | ^
+  |
