@@ -1,8 +1,20 @@
 mod io_handler;
 use io_handler::*;
-use std::io::{self, Write};
+use std::{
+    fs,
+    io::{self, Write},
+    path::Path,
+};
 
 fn main() {
+    let history_path = "./cache/chat_history.json";
+    if !Path::new(history_path).exists() {
+        // Make sure the ./cache directory exists
+        fs::create_dir_all("./cache").unwrap();
+        // Create an empty JSON array in the file
+        fs::write(history_path, "[]").unwrap();
+    }
+
     let mut user_list = UserList {
         active_users: std::collections::HashMap::new(),
     };
@@ -38,6 +50,8 @@ fn main() {
             break;
         } else if message.eq_ignore_ascii_case("/users") {
             user_list.display_active_users();
+        } else if message.eq_ignore_ascii_case("/clear") {
+            clear_messages("./cache/chat_history.json");
         } else if !message.is_empty() {
             // Log and display message
             if let Err(e) = log_message(&username, message) {

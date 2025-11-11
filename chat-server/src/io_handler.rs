@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
@@ -83,6 +84,13 @@ pub fn print_messages(path: &str) -> std::io::Result<()> {
     }
     println!("--------------------");
 
+    Ok(())
+}
+
+pub fn clear_messages(path: &str) -> std::io::Result<()> {
+    let mut file = File::create(path)?;
+    let empty_json = json!({});
+    file.write_all(empty_json.to_string().as_bytes())?;
     Ok(())
 }
 
