@@ -33,8 +33,7 @@ fn main() {
     println!("(Type '/users' to see who's active, '/quit' to exit)\n");
 
     // Simulate user joining
-    let user_id = rand::random::<i32>().abs(); // random ID BUT MAKE IT NOT RANDOM! MAKE IT A HASH OF THE USER
-    user_list.handle_join_message(user_id);
+    user_list.handle_join_message(&username);
 
     loop {
         print!("> ");
@@ -45,13 +44,13 @@ fn main() {
         let message = input.trim();
 
         if message.eq_ignore_ascii_case("/quit") {
-            user_list.handle_leave_message(&user_id);
+            user_list.handle_leave_message(&username);
             println!("Goodbye!");
             break;
         } else if message.eq_ignore_ascii_case("/users") {
             user_list.display_active_users();
         } else if message.eq_ignore_ascii_case("/clear") {
-            clear_messages("./cache/chat_history.json");
+            let _ = clear_messages("./cache/chat_history.json");
         } else if !message.is_empty() {
             // Log and display message
             if let Err(e) = log_message(&username, message) {

@@ -1,1 +1,1 @@
-C:\MiaLocal\Documents\GitProjects\CS128\CS199-128-Final-Project-FA25-\chat-server\target\debug\chat-server.exe: C:\MiaLocal\Documents\GitProjects\CS128\CS199-128-Final-Project-FA25-\chat-server\src\io_handler.rs C:\MiaLocal\Documents\GitProjects\CS128\CS199-128-Final-Project-FA25-\chat-server\src\main.rs
+/Users/lenlivshits/cs199/CS199-128-Final-Project-FA25-/chat-server/target/debug/chat-server: /Users/lenlivshits/cs199/CS199-128-Final-Project-FA25-/chat-server/src/io_handler.rs /Users/lenlivshits/cs199/CS199-128-Final-Project-FA25-/chat-server/src/main.rs

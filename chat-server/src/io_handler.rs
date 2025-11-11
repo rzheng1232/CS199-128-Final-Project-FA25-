@@ -6,14 +6,14 @@ use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
 
 // user stuff
-#[derive(Clone, Copy)]
+#[derive(Clone, Hash)]
 pub struct User {
-    pub id: i32,
+    pub id: String,
 }
 
 #[derive(Clone)]
-pub struct UserList {
-    pub active_users: HashMap<i32, User>,
+pub struct UserList<'a> {
+    pub active_users: HashMap<&'a str, User>,
 }
 
 // message stuff
@@ -94,14 +94,18 @@ pub fn clear_messages(path: &str) -> std::io::Result<()> {
     Ok(())
 }
 
-impl UserList {
-    pub fn handle_join_message(&mut self, user_id: i32) {
-        let new_user = User { id: user_id };
-        self.active_users.insert(user_id, new_user);
+// pub fn hash_name(name: &str) -> Jas {}
+
+impl<'a> UserList<'a> {
+    pub fn handle_join_message(&mut self, user_id: &'a str) {
+        let new_user = User {
+            id: user_id.to_string(),
+        };
+        self.active_users.insert(user_id, new_user.clone());
         println!("User {} joined.", new_user.id);
     }
 
-    pub fn handle_leave_message(&mut self, user_id: &i32) {
+    pub fn handle_leave_message(&mut self, user_id: &'a str) {
         if self.active_users.remove(user_id).is_some() {
             println!("User {} left.", user_id);
         }
@@ -188,15 +192,15 @@ mod tests {
             active_users: HashMap::new(),
         };
 
-        user_list.handle_join_message(1);
-        user_list.handle_join_message(2);
+        user_list.handle_join_message("1");
+        user_list.handle_join_message("2");
 
-        assert!(user_list.active_users.contains_key(&1));
-        assert!(user_list.active_users.contains_key(&2));
+        assert!(user_list.active_users.contains_key(&"1"));
+        assert!(user_list.active_users.contains_key(&"2"));
         assert_eq!(user_list.active_users.len(), 2);
 
-        user_list.handle_leave_message(&1);
-        assert!(!user_list.active_users.contains_key(&1));
+        user_list.handle_leave_message("1");
+        assert!(!user_list.active_users.contains_key(&"1"));
         assert_eq!(user_list.active_users.len(), 1);
     }
 
@@ -211,10 +215,10 @@ mod tests {
         let mut user_list = UserList {
             active_users: HashMap::new(),
         };
-        user_list.handle_join_message(100);
-        user_list.handle_join_message(200);
+        user_list.handle_join_message("test1");
+        user_list.handle_join_message("test2");
         user_list.display_active_users();
-        assert!(user_list.active_users.contains_key(&100));
-        assert!(user_list.active_users.contains_key(&200));
+        assert!(user_list.active_users.contains_key(&"test1"));
+        assert!(user_list.active_users.contains_key(&"test2"));
     }
 }
