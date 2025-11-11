@@ -56,3 +56,6 @@ $RECYCLE.BIN/
 *.old
 .cache/
 target-old/
+
+# --- Chat History ---
+chat_history.json
