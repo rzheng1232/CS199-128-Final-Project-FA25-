@@ -1,34 +1,63 @@
-# --- Normalize line endings ---
+# --- Normalize all text files to LF ---
 * text=auto eol=lf
 
-# --- Ensure Rust source files use LF ---
-*.rs text eol=lf
+# --- Rust source files ---
+*.rs      text eol=lf
+
+# --- React, Node & Frontend assets ---
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.css     text eol=lf
+*.scss    text eol=lf
+*.html    text eol=lf
+*.svg     text eol=lf
+*.env*    text eol=lf
+
+# --- Node/Yarn/PNPM lockfiles ---
+package-lock.json   text eol=lf
+yarn.lock           text eol=lf
+pnpm-lock.yaml      text eol=lf
+
+# --- Tauri config ---
+tauri.conf.json     text eol=lf
 
 # --- Mark binary files as non-diffable ---
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.pdf binary
-*.exe binary
-*.dll binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.exe   binary
+*.dll   binary
 *.dylib binary
-*.so binary
+*.so    binary
+*.webp  binary
+*.mp3   binary
+*.mp4   binary
+*.woff  binary
+*.woff2 binary
+*.otf   binary
+*.ttf   binary
 
-# --- Preserve CRLF for Windows-specific scripts ---
-*.bat text eol=crlf
-*.cmd text eol=crlf
+# --- Documentation, config, miscellaneous text ---
+*.md    text eol=lf
+*.toml  text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
 
-# --- Enforce LF for shell scripts ---
-*.sh text eol=lf
+# --- Rust's Cargo lock/config files ---
+Cargo.lock   text eol=lf
 
-# --- Treat Cargo.lock as text but don't auto-convert line endings ---
-Cargo.lock text eol=lf
+# --- Shell scripts (LF) ---
+*.sh     text eol=lf
 
-# --- Documentation and Markdown ---
-*.md text eol=lf
-*.toml text eol=lf
-*.json text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
+# --- Windows batch/scripts (CRLF) ---
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# --- Misc setup scripts ---
+*.ps1    text eol=crlf
