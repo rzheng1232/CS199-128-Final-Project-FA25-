@@ -1,32 +1,32 @@
-import { React, MouseEvent, useState } from "react";
+import { JSX, MouseEvent, useState } from "react";
+import { Chat } from "../types";
 
-function SideBar() {
-  const [activeChat, setActiveChat] = useState<string | null>(null);
-  let chats = ["Ryan", "Mia"];
+type SideBarProps = {
+  chats: Chat[];
+  activeChat: string | null;
+  handleChatClick: (chatName: string) => void;
+};
 
-  const handleClick = (chatName: string) => {
-    console.log(`Clicked on ${chatName}`);
-    setActiveChat(chatName);
-  };
-
+function SideBar({ chats, activeChat, handleChatClick }: SideBarProps): JSX.Element {
   return (
     <div
       className="d-flex flex-column bg-dark text-light p-3"
-      style={{ height: "100vh", width: "250px" }}
+      style={{ height: "100vh", width: "250px", overflowY: "auto" }}
     >
       <h1>Chats</h1>
-      {chats.length === 0 && <p>Start your first chat!</p>}{" "}
+      {chats.length === 0 && <p>Start your first chat!</p>}
       {/* Inspires users to start a chat if there are none instead of just displaying nothing */}
       <ul className="nav flex-column">
         {chats.map((chat) => (
-          <li key={chat} onClick={() => handleClick(chat)} className="nav-item">
+          <li key={chat.name}>
             <a
               href="#"
-              className={
-                `nav-link ${activeChat === chat ? "bg-secondary text-white" : "text-light"}`
-              }
+              onClick={() => handleChatClick(chat.name)}
+              className={`nav-link ${
+                activeChat === chat.name ? "bg-secondary text-white" : "text-light"
+              }`}
             >
-              {chat}
+              {chat.name}
             </a>
           </li>
         ))}
