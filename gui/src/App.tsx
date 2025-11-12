@@ -8,7 +8,7 @@ import { useState } from "react";
 function App() {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
 
-  const chats: Chat[] = [
+  const chats: Chat[] = [ // Temporary hard coded messages
     {
       name: "Ryan",
       messages: [
