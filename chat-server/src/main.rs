@@ -10,12 +10,7 @@ use argon2::{
     },
     Argon2
 };use sqlx::{query, SqlitePool};
-use std::thread;
-use std::thread::{JoinHandle};
-use std::time::SystemTime;
-
-use std::time::Duration;
-use chrono::Utc;
+use chrono;
 use tokio;
 
 // Things the central sever processor needs to handle:
@@ -53,12 +48,10 @@ async fn main() -> Result<(), sqlx::Error>{
         }));
     }
     
-    // let pool = Arc::new(pool);
     let app = Router::new()
         .route("/", get(root))
         // .route("/Authenticate/username/{name}/password/{pass}", get(login))
         .route("/createaccount/username/{name}/password/{pass}", get(new_user))
-        // .route("/createchatname/{chat_name}", get(new_chat))
         .route("/createchat", get(new_chat))
         .route("/newmessage/chatname/{chat}/username/{user}", post(incoming_message))
         .with_state(pool.clone());
@@ -74,55 +67,59 @@ async fn root() -> Json<String>{
     println!("200");
     Json(String::from("Root!"))
 }
+/// Background thread for message processing tasks, retrieves oldest unprocessed message in the message_queue, processes it, and adds to the chat_history_cache json
+/// TODO: Shared state concurency & synchronization when running multiple message_threads on sqlite database
 async fn message_thread(pool:SqlitePool){
     let limit:i64 = 5;
-    let curr_message = query!(
-        "SELECT id, message_id FROM message_queue WHERE status = 'Queued' ORDER BY queued_at ASC LIMIT ?", limit).
-        fetch_one(&pool).await.unwrap();
-    let message_stuff = query!(
-        "SELECT content, chat_id, user_id FROM messages WHERE id = ?", curr_message.message_id).
-        fetch_one(&pool).await.unwrap();
-    let username = query!("SELECT username FROM users WHERE id = ?", message_stuff.user_id)
-        .fetch_one(&pool)
-        .await.unwrap().username; 
-    let message_content = message_stuff.content;
-    let chat_id = message_stuff.chat_id;
-    // TODO: Do something, maybe filtering bad words or chat moderation
-    let json_message_history = query!(
-        "SELECT message_history FROM chat_history_cache WHERE chat_id = ?", chat_id).
-        fetch_one(&pool).await.unwrap().message_history;
-    if let Some(json_string) = json_message_history {
-        let mut messages: Vec<ChatHistoryMessage> = serde_json::from_str(&json_string).unwrap();
-        messages.push(ChatHistoryMessage{
-            username:username,
-            content: message_content,
-            created_at: chrono::Utc::now().to_rfc3339(),
-        });
-        let json_history = serde_json::to_string(&messages).unwrap();
+    while true {
+        let curr_message = match query!(
+            "SELECT id, message_id FROM message_queue WHERE status = 'Queued' ORDER BY queued_at ASC LIMIT ?", limit)
+            .fetch_optional(&pool)
+            .await
+            .unwrap() {
+            Some(msg) => msg,
+            None => {println!("No valid messages, trying agian in 5 seconds... ");tokio::time::sleep(std::time::Duration::from_secs(5)).await; continue;},
+        };
+        let message_stuff = query!(
+            "SELECT content, chat_id, user_id FROM messages WHERE id = ?", curr_message.message_id).
+            fetch_one(&pool).await.unwrap();
+        let username = query!("SELECT username FROM users WHERE id = ?", message_stuff.user_id)
+            .fetch_one(&pool)
+            .await.unwrap().username; 
+        let message_content = message_stuff.content;
+        let chat_id = message_stuff.chat_id;
+        // TODO: Do something, maybe filtering bad words or chat moderation
+        let json_message_history = query!(
+            "SELECT message_history FROM chat_history_cache WHERE chat_id = ?", chat_id).
+            fetch_one(&pool).await.unwrap().message_history;
+        if let Some(json_string) = json_message_history {
+            let mut messages: Vec<ChatHistoryMessage> = serde_json::from_str(&json_string).unwrap();
+            messages.push(ChatHistoryMessage{
+                username:username,
+                content: message_content,
+                created_at: chrono::Utc::now().to_rfc3339(),
+            });
+            let json_history = serde_json::to_string(&messages).unwrap();
+            query!(
+                "UPDATE chat_history_cache SET message_history = ? WHERE id = ?",
+                json_history,
+                chat_id
+            ).execute(&pool)
+            .await.unwrap();
+        }
+        println!("Updated cache history");
         query!(
-            "UPDATE chat_history_cache SET message_history = ? WHERE id = ?",
-            json_history,
-            chat_id
+            "UPDATE message_queue SET status = ? WHERE message_id = ?",
+            "Finished",
+            curr_message.message_id,
         ).execute(&pool)
         .await.unwrap();
-        // sqlx::query!(
-        //     r#"INSERT INTO chat_history_cache (chat_id, message_history, updated_at)
-        //     VALUES (?, ?, datetime('now'))"#, chat_id, json_history
-        //     ).execute(&pool).await.unwrap();
+        query!(
+            "UPDATE messages SET status = ? WHERE id = ?",
+            "Sent!",
+            curr_message.message_id
+        ).execute(&pool).await.unwrap();
     }
-    println!("Updated cache history");
-    query!(
-        "UPDATE message_queue SET status = ? WHERE message_id = ?",
-        "Finished",
-        curr_message.message_id,
-    ).execute(&pool)
-    .await.unwrap();
-    query!(
-        "UPDATE messages SET status = ? WHERE id = ?",
-        "Sent!",
-        curr_message.message_id
-    ).execute(&pool).await.unwrap();
-    
 }
 /// Queues incoming messages from users; Messages are added to priority queue (by time created) in sql database and processed by background threads
 /// # Query format:
