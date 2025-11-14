@@ -54,6 +54,7 @@ async fn main() -> Result<(), sqlx::Error>{
         .route("/createaccount/username/{name}/password/{pass}", get(new_user))
         .route("/createchat", get(new_chat))
         .route("/newmessage/chatname/{chat}/username/{user}", post(incoming_message))
+        .route("/getchat/chatname/{chat}", get(get_message_history))
         .with_state(pool.clone());
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -67,6 +68,7 @@ async fn root() -> Json<String>{
     println!("200");
     Json(String::from("Root!"))
 }
+
 /// Background thread for message processing tasks, retrieves oldest unprocessed message in the message_queue, processes it, and adds to the chat_history_cache json
 /// TODO: Shared state concurency & synchronization when running multiple message_threads on sqlite database
 async fn message_thread(pool:SqlitePool){
@@ -119,6 +121,26 @@ async fn message_thread(pool:SqlitePool){
             "Sent!",
             curr_message.message_id
         ).execute(&pool).await.unwrap();
+    }
+}
+/// Retrieves chat history given chatname
+/// # Query format:
+/// curl "http://127.0.0.1:3000/getchat/chatname/ChatName" 
+/// # Return format:
+/// Array of ChatHistoryMessage datatypes, each containing "username", "content", and "created_at" headers
+async fn get_message_history(
+    Path(chatname):Path<String>, State(pool): State<SqlitePool>)->Result<Json<Vec<ChatHistoryMessage>>, ()>{
+    let chat_id = query!(
+        "SELECT id FROM chats WHERE name = ?", chatname).
+        fetch_one(&pool).await.unwrap().id;
+    let json_message_history = query!(
+        "SELECT message_history FROM chat_history_cache WHERE chat_id = ?", chat_id).
+        fetch_one(&pool).await.unwrap().message_history;
+    if let Some(json_string) = json_message_history {
+        let  messages: Vec<ChatHistoryMessage> = serde_json::from_str(&json_string).unwrap();
+        return Ok(Json(messages));
+    } else{
+        return Err(());
     }
 }
 /// Queues incoming messages from users; Messages are added to priority queue (by time created) in sql database and processed by background threads
