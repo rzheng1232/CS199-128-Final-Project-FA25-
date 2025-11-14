@@ -46,3 +46,8 @@ Checkpoint 2: Set up advanced things -- Centralize message storage on the server
 
 ## References:
 This project is inspired by a lot of different chat apps and websites, but with a focus on encryption and message history that can be transferred between devices.
+https://docs.rs/axum/latest/axum/ 
+https://docs.rs/argon2/latest/argon2/
+https://docs.rs/sqlx_wasi/latest/sqlx/
+https://www.sqlitetutorial.net
+https://tokio.rs/tokio/tutorial
