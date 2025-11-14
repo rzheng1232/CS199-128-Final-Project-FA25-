@@ -1,0 +1,2 @@
+fn(axum::Json<Message>, Extension<Arc<Pool<Sqlite>>>) -> impl Future<Output = axum::Json<std::string::String>> {message}
+fn(axum::Json<Message>, Extension<Arc<Pool<Sqlite>>>) -> impl Future<Output = axum::Json<std::string::String>> {message}: Handler<_, _>

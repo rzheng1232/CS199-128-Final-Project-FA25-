@@ -1,0 +1,2 @@
+fn(State<Pool<Sqlite>>, axum::extract::Query<CreateChatParams>) -> impl Future<Output = axum::Json<Result<(), ()>>> {new_chat}
+fn(State<Pool<Sqlite>>, axum::extract::Query<CreateChatParams>) -> impl Future<Output = axum::Json<Result<(), ()>>> {new_chat}: Handler<_, _>
