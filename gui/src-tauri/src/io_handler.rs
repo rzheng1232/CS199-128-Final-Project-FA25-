@@ -33,12 +33,14 @@ pub fn display_message(message: &str) {
 }
 
 // save chat
-pub fn log_message(user: &str, message: &str) -> io::Result<()> {
+#[tauri::command]
+pub fn log_message(user: &str, message: &str) -> Result<(), String> {
     let path = "./cache/chat_history.json";
 
     let mut messages: Vec<Message> = if let Ok(mut file) = File::open(path) {
         let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
+        file.read_to_string(&mut contents)
+            .map_err(|e| e.to_string())?;
         serde_json::from_str(&contents).unwrap_or_default()
     } else {
         Vec::new()
@@ -52,45 +54,40 @@ pub fn log_message(user: &str, message: &str) -> io::Result<()> {
 
     messages.push(new_message);
 
-    let json = serde_json::to_string_pretty(&messages)?;
+    let json = serde_json::to_string_pretty(&messages).map_err(|e| e.to_string())?;
     let mut file = OpenOptions::new()
         .create(true)
         .write(true)
         .truncate(true)
-        .open(path)?;
+        .open(path)
+        .map_err(|e| e.to_string())?;
 
-    file.write_all(json.as_bytes())?;
+    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
     Ok(())
 }
 
-pub fn print_messages(path: &str) -> std::io::Result<()> {
+#[tauri::command]
+pub fn print_messages(path: Option<String>) -> Result<String, String> {
     use std::fs::File;
     use std::io::Read;
 
-    let mut file = File::open(path)?;
+    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
+    let mut file = File::open(&path).map_err(|e| e.to_string())?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    file.read_to_string(&mut contents)
+        .map_err(|e| e.to_string())?;
 
     let messages: Vec<Message> = serde_json::from_str(&contents).unwrap_or_default();
+    let json = serde_json::to_string(&messages).map_err(|e| e.to_string())?;
 
-    println!("--- Chat History ---");
-    for msg in messages {
-        println!(
-            "[{}] {}: {}",
-            msg.timestamp.format("%Y-%m-%d %H:%M:%S"),
-            msg.user,
-            msg.message
-        );
-    }
-    println!("--------------------");
-
-    Ok(())
+    Ok((json))
 }
 
-pub fn clear_messages(path: &str) -> std::io::Result<()> {
-    let mut file = File::create(path)?;
-    let empty_json = json!({});
-    file.write_all(empty_json.to_string().as_bytes())?;
+#[tauri::command]
+pub fn clear_messages(path: Option<String>) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
+    let mut file = File::create(&path).map_err(|e| e.to_string())?;
+    file.write_all(b"[]").map_err(|e| e.to_string())?;
     Ok(())
 }
 

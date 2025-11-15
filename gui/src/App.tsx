@@ -2,36 +2,18 @@ import "./App.css";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import Messagebar from "./components/Messagebar";
-import { Message, Chat } from "../types";
-import { useState } from "react";
+import { Message, Chat } from "./types";
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api";
 
 function App() {
-  const [activeChat, setActiveChat] = useState<Chat | null>(null);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
 
-  const chats: Chat[] = [ // Temporary hard coded messages
-    {
-      name: "Ryan",
-      messages: [
-        {
-          user: "Len",
-          message: "Hi!",
-          timestamp: "2025-11-11T03:12:45Z",
-        },
-        {
-          user: "Ryan",
-          message: "Hi!",
-          timestamp: "2025-11-11T03:13:10Z",
-        },
-      ],
-    },
-    {
-      name: "Mia",
-      messages: [
-        { user: "Len", message: "Hi!", timestamp: "2025-11-11T04:00:00Z" },
-        { user: "Mia", message: "Hi!", timestamp: "2025-11-11T04:01:00Z" },
-      ],
-    },
-  ];
+  const [chats, setChats] = useState<Chat[]>([]);
+
+  useEffect(() => {
+    invoke<Chat[]>("print_messages").then((data: Chat[]) => setChats(data));
+  }, []);
 
   const handleClick = (chatName: string) => {
     console.log(`Clicked on ${chatName}`);
