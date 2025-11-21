@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
@@ -17,11 +16,17 @@ pub struct UserList<'a> {
 }
 
 // message stuff
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     pub user: String,
     pub message: String,
     pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Chat {
+    pub name: String,
+    pub messages: Vec<Message>,
 }
 
 // sending a message and printing it out
@@ -34,17 +39,13 @@ pub fn display_message(message: &str) {
 
 // save chat
 #[tauri::command]
-pub fn log_message(user: &str, message: &str) -> Result<(), String> {
+pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), String> {
+    use std::fs::OpenOptions;
+    use std::io::Write;
+
     let path = "./cache/chat_history.json";
 
-    let mut messages: Vec<Message> = if let Ok(mut file) = File::open(path) {
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)
-            .map_err(|e| e.to_string())?;
-        serde_json::from_str(&contents).unwrap_or_default()
-    } else {
-        Vec::new()
-    };
+    let mut chats = read_chats_from_json(path);
 
     let new_message = Message {
         user: user.to_string(),
@@ -52,9 +53,17 @@ pub fn log_message(user: &str, message: &str) -> Result<(), String> {
         timestamp: Utc::now(),
     };
 
-    messages.push(new_message);
+    if let Some(chat) = chats.iter_mut().find(|c| c.name == chat_name) {
+        chat.messages.push(new_message);
+    } else {
+        chats.push(Chat {
+            name: chat_name,
+            messages: vec![new_message],
+        });
+    }
 
-    let json = serde_json::to_string_pretty(&messages).map_err(|e| e.to_string())?;
+    let json = serde_json::to_string_pretty(&chats).map_err(|e| e.to_string())?;
+
     let mut file = OpenOptions::new()
         .create(true)
         .write(true)
@@ -63,24 +72,30 @@ pub fn log_message(user: &str, message: &str) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
-#[tauri::command]
-pub fn print_messages(path: Option<String>) -> Result<String, String> {
+fn read_chats_from_json(path: &str) -> Vec<Chat> {
     use std::fs::File;
     use std::io::Read;
 
-    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
-    let mut file = File::open(&path).map_err(|e| e.to_string())?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .map_err(|e| e.to_string())?;
+    if let Ok(mut file) = File::open(path) {
+        let mut contents = String::new();
+        if file.read_to_string(&mut contents).is_ok() {
+            return serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
+        }
+    }
+    Vec::new()
+}
 
-    let messages: Vec<Message> = serde_json::from_str(&contents).unwrap_or_default();
-    let json = serde_json::to_string(&messages).map_err(|e| e.to_string())?;
+#[tauri::command]
+pub fn print_messages(path: Option<String>) -> Result<Vec<Chat>, String> {
+    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string());
 
-    Ok((json))
+    let chats = read_chats_from_json(&path);
+
+    Ok(chats)
 }
 
 #[tauri::command]
