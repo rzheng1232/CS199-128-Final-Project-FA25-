@@ -1,2 +1,0 @@
-axum::Json<Result<(), ()>>
-Result<Infallible, sqlx::Error>
