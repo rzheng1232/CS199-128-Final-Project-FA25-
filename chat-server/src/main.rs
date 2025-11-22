@@ -1,3 +1,3 @@
+mod encryption;
 
-fn main() {
-}
+fn main() {}
