@@ -60,3 +60,6 @@ target-old/
 # --- Chat History ---
 chat_history.json
 chat.db
+
+# Rust
+chat-server/target/

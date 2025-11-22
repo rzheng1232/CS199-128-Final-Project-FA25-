@@ -1,2 +1,0 @@
-fn(axum::extract::Path<(std::string::String, std::string::String)>, State<Pool<Sqlite>>, axum::Json<Message>) -> impl Future<Output = axum::Json<Result<(), ()>>> {incoming_message}
-fn(axum::extract::Path<(std::string::String, std::string::String)>, State<Pool<Sqlite>>, axum::Json<Message>) -> impl Future<Output = axum::Json<Result<(), ()>>> {incoming_message}: Handler<_, _>

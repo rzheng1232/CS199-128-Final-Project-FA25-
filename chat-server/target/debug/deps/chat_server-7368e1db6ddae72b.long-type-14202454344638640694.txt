@@ -1,1 +1,0 @@
-for<'a> Router<Pool<Sqlite>>: tower_service::Service<IncomingStream<'a, tokio::net::TcpListener>>

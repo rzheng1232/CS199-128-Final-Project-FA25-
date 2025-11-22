@@ -1,1 +1,0 @@
-fn({type error}, {type error}) -> impl Future<Output = axum::Json<Result<(), ()>>> {new_chat}: Handler<_, _>
