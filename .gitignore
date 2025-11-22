@@ -10,11 +10,7 @@ Cargo.lock
 # --- IDE and editor settings ---
 # VS Code
 .vscode/
-# IntelliJ / CLion / RustRover
-.idea/
-# Sublime Text
-*.sublime-workspace
-*.sublime-project
+
 
 # --- OS-specific files ---
 # macOS
@@ -41,7 +37,6 @@ $RECYCLE.BIN/
 # --- Build tools and scripts ---
 dist/
 out/
-bin/
 build/
 
 # --- Environment & secrets ---
@@ -60,3 +55,11 @@ target-old/
 # --- Chat History ---
 chat_history.json
 chat.db
+
+# --- Database Stuff ---
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+.env
+.env.local
