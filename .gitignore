@@ -1,26 +1,18 @@
 # --- Rust build artifacts ---
-/target/
-/debug/
-/release/
-**/*.rs.bk
+**/target/
+**/debug/
+**/release/
 
 # --- Cargo package manager ---
 Cargo.lock
-
-# --- Tauri specific ---
-/gui/src-tauri/target/
-/gen/schemas
-
-# --- Node / React / Vite ---
-node_modules/
-dist/
-dist-ssr/
-*.local
+**/*.rs.bk
 
 # --- IDE and editor settings ---
-.vscode/*
-!.vscode/extensions.json
+# VS Code
+.vscode/
+# IntelliJ / CLion / RustRover
 .idea/
+# Sublime Text
 *.sublime-workspace
 *.sublime-project
 
@@ -36,21 +28,35 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # --- Logs and temp files ---
-logs/
 *.log
 *.tmp
 *.temp
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # --- Test & coverage output ---
 /coverage/
 /test-results/
 *.profraw
-*.profdat*
+*.profdata
+
+# --- Build tools and scripts ---
+dist/
+out/
+bin/
+build/
+
+# --- Environment & secrets ---
+.env
+.env.local
+.env.*
+
+# --- Backup / cache ---
+*.bak
+*.swp
+*.swo
+*.old
+.cache/
+target-old/
 
 # --- Chat History ---
 chat_history.json
+chat.db
