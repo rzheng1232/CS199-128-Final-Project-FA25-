@@ -29,23 +29,32 @@ function App() {
   };
 
   const handleSend = async (text: string) => {
-    if (!activeChat) return; 
+    if (!activeChat) return;
 
     try {
- 
       await invoke("log_message", {
-        chatName: activeChat, 
-        user: "Len", 
+        chatName: activeChat,
+        user: "Len",
         message: text,
       });
 
-      const updatedChats = await invoke<Chat[]>("print_messages", { path: null });
+      const updatedChats = await invoke<Chat[]>("print_messages", {
+        path: null,
+      });
       setChats(updatedChats);
-      
     } catch (error) {
       console.error("Failed to send:", error);
       alert("Error sending message: " + error);
     }
+  };
+
+  const handleNewChat = async () => {
+    invoke("log_message", {
+      chatName: "Test",
+      user: "Len",
+      message: "",
+    });
+    invoke<Chat[]>("print_messages", { path: null });
   };
 
   return (
@@ -54,6 +63,7 @@ function App() {
         chats={chats}
         activeChat={activeChat}
         handleChatClick={handleClick}
+        handleNewChat={handleNewChat}
       />
       <div className="flex-grow-1 d-flex flex-column">
         <ChatWindow

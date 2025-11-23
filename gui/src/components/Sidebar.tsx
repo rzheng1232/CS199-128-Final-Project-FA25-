@@ -5,9 +5,10 @@ type SideBarProps = {
   chats: Chat[];
   activeChat: string | null;
   handleChatClick: (chatName: string) => void;
+  handleNewChat: () => void;
 };
 
-function SideBar({ chats, activeChat, handleChatClick }: SideBarProps): JSX.Element {
+function SideBar({ chats, activeChat, handleChatClick, handleNewChat }: SideBarProps): JSX.Element {
   return (
     <div
       className="d-flex flex-column bg-dark text-light p-3"
@@ -31,6 +32,9 @@ function SideBar({ chats, activeChat, handleChatClick }: SideBarProps): JSX.Elem
           </li>
         ))}
       </ul>
+      <button type="button" className="btn btn-primary" onClick = {handleNewChat}>
+        New Chat
+      </button>
     </div>
   );
 }
