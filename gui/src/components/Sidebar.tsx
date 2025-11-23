@@ -1,4 +1,4 @@
-import { JSX, MouseEvent, useState } from "react";
+import { JSX } from "react";
 import { Chat } from "../types";
 
 type SideBarProps = {

@@ -1,0 +1,28 @@
+.login-container {
+    background-color: rgb(237, 244, 254);
+    color: rgb(34, 34, 36);
+    text-align: center;
+}
+
+
+.login-input {
+    text-align: center;
+    align-content: center;
+    background-color: rgb(217, 217, 217);
+    color: rgb(34, 34, 36);
+}
+
+.login-input::placeholder{
+   color: rgb(181, 181, 181);
+   font-style: italic;
+}
+
+.login-button {
+    background-color: lightblue;
+    color: navy;
+}
+
+.login-button:hover {
+    background-color: cornflowerblue;
+    color: navy;
+}
