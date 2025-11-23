@@ -5,10 +5,29 @@ type SideBarProps = {
   chats: Chat[];
   activeChat: string | null;
   handleChatClick: (chatName: string) => void;
-  handleNewChat: () => void;
+  onNewChat: (username: string) => void;
 };
 
-function SideBar({ chats, activeChat, handleChatClick, handleNewChat }: SideBarProps): JSX.Element {
+function SideBar({
+  chats,
+  activeChat,
+  handleChatClick,
+  onNewChat,
+}: SideBarProps): JSX.Element {
+  const [username, setUsername] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const handleNewChat = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username.trim()) {
+      onNewChat(username.trim());
+      setUsername("");
+    }
+  }
+
   return (
     <div
       className="d-flex flex-column bg-dark text-light p-3"
@@ -24,7 +43,9 @@ function SideBar({ chats, activeChat, handleChatClick, handleNewChat }: SideBarP
               href="#"
               onClick={() => handleChatClick(chat.name)}
               className={`nav-link ${
-                activeChat === chat.name ? "bg-secondary text-white" : "text-light"
+                activeChat === chat.name
+                  ? "bg-secondary text-white"
+                  : "text-light"
               }`}
             >
               {chat.name}
@@ -32,9 +53,22 @@ function SideBar({ chats, activeChat, handleChatClick, handleNewChat }: SideBarP
           </li>
         ))}
       </ul>
-      <button type="button" className="btn btn-primary" onClick = {handleNewChat}>
-        New Chat
-      </button>
+      <form
+        className="d-flex p-3"
+        style={{ gap: "0.5em" }}
+        onSubmit={handleNewChat}
+      >
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Username"
+          value={username}
+          onChange={handleChange}
+        />
+        <button type="button" className="btn btn-primary">
+          New Chat
+        </button>
+      </form>
     </div>
   );
 }

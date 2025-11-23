@@ -48,9 +48,10 @@ function App() {
     }
   };
 
-  const handleNewChat = async () => {
+  const handleNewChat = async (username: string) => {
+    setActiveChat(username);
     invoke("log_message", {
-      chatName: "Test",
+      chatName: username,
       user: "Len",
       message: "",
     });
@@ -63,7 +64,7 @@ function App() {
         chats={chats}
         activeChat={activeChat}
         handleChatClick={handleClick}
-        handleNewChat={handleNewChat}
+        onNewChat={handleNewChat}
       />
       <div className="flex-grow-1 d-flex flex-column">
         <ChatWindow
