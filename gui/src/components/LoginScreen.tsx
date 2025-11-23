@@ -1,10 +1,11 @@
-import { invoke } from "@tauri-apps/api/core"; // This is how you call Rust from frontend
+import { invoke } from "@tauri-apps/api/core"; // 
 
 type Props = {
-    onLoginSuccess: () => void;
+    onLoginSuccess: (username: string) => void;
 };
 
 function LoginScreen({ onLoginSuccess }: Props) {
+
     async function tryLogin() {
         const username = (document.getElementById("user") as HTMLInputElement).value.trim();
         const password = (document.getElementById("pass") as HTMLInputElement).value;
@@ -12,7 +13,8 @@ function LoginScreen({ onLoginSuccess }: Props) {
         try {
             const result = await invoke<string>("login", { username, password });
             console.log("Login success:", result);
-            onLoginSuccess();
+            onLoginSuccess(username);
+
         } catch (error: any) {
             console.error("Login failed:", error);
             alert("Wrong username or password");

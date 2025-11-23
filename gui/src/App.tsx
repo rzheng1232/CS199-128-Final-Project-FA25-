@@ -4,13 +4,13 @@ import LoginScreen from "./components/LoginScreen";   // your login component
 import ChatApp from "./ChatApp";           // chat
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
 
-  if (!isLoggedIn) {
-    return <LoginScreen onLoginSuccess={() => setIsLoggedIn(true)} />;
+  if (!currentUser) {
+    return <LoginScreen onLoginSuccess={setCurrentUser} />;
   }
 
-  return <ChatApp />;
+  return <ChatApp currentUser={currentUser} />;
 }
 
 export default App;

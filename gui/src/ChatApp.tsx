@@ -7,7 +7,11 @@ import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
+type Props = {
+  currentUser: String;
+}
+
+function ChatApp({ currentUser }: Props) {
   const [activeChat, setActiveChat] = useState<string | null>(null);
 
   const [chats, setChats] = useState<Chat[]>([]);
@@ -29,19 +33,19 @@ function App() {
   };
 
   const handleSend = async (text: string) => {
-    if (!activeChat) return; 
+    if (!activeChat) return;
 
     try {
- 
+
       await invoke("log_message", {
-        chatName: activeChat, 
-        user: "Len", 
+        chatName: activeChat,
+        user: currentUser,
         message: text,
       });
 
       const updatedChats = await invoke<Chat[]>("print_messages", { path: null });
       setChats(updatedChats);
-      
+
     } catch (error) {
       console.error("Failed to send:", error);
       alert("Error sending message: " + error);
@@ -64,4 +68,4 @@ function App() {
     </div>
   );
 }
-export default App;
+export default ChatApp;

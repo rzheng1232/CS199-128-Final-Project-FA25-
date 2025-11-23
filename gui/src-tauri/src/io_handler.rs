@@ -8,6 +8,7 @@ use std::io::Write;
 #[derive(Clone, Hash)]
 pub struct User {
     pub id: String,
+    pub password: String,
 }
 
 #[derive(Clone)]
@@ -112,6 +113,7 @@ impl<'a> UserList<'a> {
     pub fn handle_join_message(&mut self, user_id: &'a str) {
         let new_user = User {
             id: user_id.to_string(),
+            password: " ".to_string(), // irrelevant here???
         };
         self.active_users.insert(user_id, new_user.clone());
         println!("User {} joined.", new_user.id);
