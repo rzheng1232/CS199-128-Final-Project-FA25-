@@ -1,7 +1,7 @@
 # --- Rust build artifacts ---
-/target/
-/debug/
-/release/
+**/target/
+**/debug/
+**/release/
 
 # --- Cargo package manager ---
 Cargo.lock
@@ -10,11 +10,7 @@ Cargo.lock
 # --- IDE and editor settings ---
 # VS Code
 .vscode/
-# IntelliJ / CLion / RustRover
-.idea/
-# Sublime Text
-*.sublime-workspace
-*.sublime-project
+
 
 # --- OS-specific files ---
 # macOS
@@ -39,10 +35,11 @@ $RECYCLE.BIN/
 *.profdata
 
 # --- Build tools and scripts ---
-/dist/
-/out/
-/bin/
-/build/
+chat-server/cache/
+node-modules/
+dist/
+out/
+build/
 
 # --- Environment & secrets ---
 .env
@@ -60,3 +57,11 @@ target-old/
 # --- Chat History ---
 chat_history.json
 chat.db
+
+# --- Database Stuff ---
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+.env
+.env.local
