@@ -1,5 +1,4 @@
 import React, { JSX, useState } from "react";
-import { Message, Chat } from "../types";
 
 type MessageBarProps = {
   onSend: (text: string) => void;

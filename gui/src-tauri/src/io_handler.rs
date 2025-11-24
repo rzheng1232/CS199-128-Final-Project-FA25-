@@ -1,13 +1,14 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs::{self, File, OpenOptions};
-use std::io::{self, Read, Write};
+use std::fs::{File, OpenOptions};
+use std::io::Write;
 
 // user stuff
 #[derive(Clone, Hash)]
 pub struct User {
     pub id: String,
+    pub password: String,
 }
 
 #[derive(Clone)]
@@ -115,6 +116,7 @@ impl<'a> UserList<'a> {
     pub fn handle_join_message(&mut self, user_id: &'a str) {
         let new_user = User {
             id: user_id.to_string(),
+            password: " ".to_string(), // irrelevant here???
         };
         self.active_users.insert(user_id, new_user.clone());
         println!("User {} joined.", new_user.id);

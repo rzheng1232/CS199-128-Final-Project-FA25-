@@ -1,5 +1,5 @@
-import { MouseEvent, useState, JSX } from "react";
-import { Message, Chat } from "../types";
+import { JSX } from "react";
+import { Chat } from "../types";
 
 type ChatWindowProps = {
   chat: Chat | null;
