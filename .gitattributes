@@ -55,9 +55,18 @@ Cargo.lock   text eol=lf
 # --- Shell scripts (LF) ---
 *.sh     text eol=lf
 
+<<<<<<< HEAD
+# --- Documentation and Markdown ---
+*.md text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+=======
 # --- Windows batch/scripts (CRLF) ---
 *.bat    text eol=crlf
 *.cmd    text eol=crlf
 
 # --- Misc setup scripts ---
 *.ps1    text eol=crlf
+>>>>>>> local

@@ -44,9 +44,12 @@ pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), S
     use std::fs::OpenOptions;
     use std::io::Write;
 
-    let path = "./cache/chat_history.json";
+    let dir_path = "./cache";
+    let file_path = format!("{}/chat_history.json", dir_path);
 
-    let mut chats = read_chats_from_json(path);
+    fs::create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
+
+    let mut chats = read_chats_from_json(&file_path);
 
     let new_message = Message {
         user: user.to_string(),
@@ -69,7 +72,7 @@ pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), S
         .create(true)
         .write(true)
         .truncate(true)
-        .open(path)
+        .open(file_path)
         .map_err(|e| e.to_string())?;
 
     file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;

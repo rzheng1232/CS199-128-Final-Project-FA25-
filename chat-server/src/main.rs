@@ -3,5 +3,6 @@ use std::{
     io::{self, Write},
     path::Path,
 };
+mod encryption;
 
 fn main() {}
