@@ -50,7 +50,7 @@ async fn main() -> Result<(), sqlx::Error>{
     
     let app = Router::new()
         .route("/", get(root))
-        // .route("/Authenticate/username/{name}/password/{pass}", get(login))
+        .route("/Authenticate/username/{name}/password/{pass}", get(login))
         .route("/createaccount/username/{name}/password/{pass}", get(new_user))
         .route("/createchat", get(new_chat))
         .route("/newmessage/chatname/{chat}/username/{user}", post(incoming_message))
@@ -224,57 +224,47 @@ Query(params): Query<CreateChatParams>) -> Json<Result<(), ()>>{
 /// Creates new user; 
 /// # Query format:
 /// curl "http://127.0.0.1:3000/createaccount/username/NameString/password/PasswordString"  
-/// TODO: Password based authentication 
 async fn new_user(State(pool): State<SqlitePool>, Path((username, password)):Path<(String,String)>) -> Json<Result<(), ()>>{
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
     let password_hash = argon2.hash_password(password.as_bytes(), &salt).unwrap().to_string();
     let role: String = String::from("chatter");
     query!(
-    r#"INSERT INTO users (username, role, created_at)
-    VALUES (?, ?, datetime('now'))"#, username, role
+    r#"INSERT INTO users (username, password, role, created_at)
+    VALUES (?, ?, ?, datetime('now'))"#, username, password_hash, role
     ).execute(&pool).await.unwrap();
     Json(Ok(()))
 }
-
-// async fn login(Path((username, password)): Path<(String,String)>,  Extension(pool):Extension<Arc<SqlitePool>>) -> Json<Result<String, String>>{
+/// Authenticates user login
+/// # Query format:
+/// curl "http://127.0.0.1:3000/Authenticate/username/NameString/password/PasswordString" 
+async fn login(State(pool): State<SqlitePool>, Path((username, password)): Path<(String,String)>) -> Json<Result<String, String>>{
     
-//     let row = sqlx::query!(
-//         "SELECT password_hash FROM users WHERE username = ?",
-//         username
-//     ).fetch_optional(&*pool) // returns Option
-//     .await.unwrap(); 
-//     if let Some(row) = row.as_ref() {
-//         match PasswordHash::new(&row.password_hash) {
-//             Ok(parsed_hash) => {
-//                 if Argon2::default()
-//                     .verify_password(password.as_bytes(), &parsed_hash)
-//                     .is_ok()
-//                 {
-//                     println!("Password correct!");
-//                     return Json(Ok(String::from("Login Success")));
-//                 } else {
-//                     println!("Password incorrect!");
-//                     return Json(Ok(String::from("Login error")));
-//                 }
-//             }
-//             Err(_) => {
-//                 // The hash in the database is invalid
-//                 println!("Stored password hash is invalid!");
-//                 return Json(Ok(String::from("Login error")));
-//             }
-//         }
-//     } else {
-        
-//         println!("Username not found");
-//         return Json(Ok(String::from("Login error")));
-//     }
-//     // let password_hash = PasswordHash::new(&row.as_ref().unwrap().password_hash);
-//     // if Argon2::default().verify_password(password.as_bytes(), &password_hash.unwrap()).is_ok(){
-//     //     return Json(Ok(String::from("Login Successful")));
-//     // } else{
-//     //     return Json(Ok(String::from("Login error")));
-//     // }
-
-    
-// }
+    let row = sqlx::query!(
+        "SELECT password FROM users WHERE username = ?",
+        username
+    ).fetch_optional(&pool) // returns Option
+    .await.unwrap(); 
+    if let Some(row) = row.as_ref() {
+        match PasswordHash::new(&row.password) {
+            Ok(parsed_hash) => {
+                if Argon2::default()
+                    .verify_password(password.as_bytes(), &parsed_hash)
+                    .is_ok()
+                {
+                    return Json(Ok(String::from("Login Success")));
+                } else {
+                    return Json(Ok(String::from("Login error")));
+                }
+            }
+            Err(_) => {
+                // The hash in the database is invalid
+                println!("Stored password hash is invalid!");
+                return Json(Ok(String::from("Login error")));
+            }
+        }
+    } else {
+        println!("Username not found");
+        return Json(Ok(String::from("Login error")));
+    }
+}
