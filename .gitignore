@@ -35,6 +35,8 @@ $RECYCLE.BIN/
 *.profdata
 
 # --- Build tools and scripts ---
+chat-server/cache/
+node-modules/
 dist/
 out/
 build/
