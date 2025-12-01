@@ -53,14 +53,28 @@ function ChatApp({ currentUser }: Props) {
   };
 
   const handleNewChat = async (username: string) => {
-    setActiveChat(username);
-    invoke("log_message", {
-      chatName: username,
-      user: "Len",
-      message: "",
+  if (!username) return;
+
+  try {
+    setChats((prev) => {
+      if (prev.some((c) => c.name === username)) return prev;
+      return [...prev, { name: username, messages: [] }];
     });
-    invoke<Chat[]>("print_messages", { path: null });
-  };
+
+    setActiveChat(username);
+
+    await invoke("new_chat", {
+      chatName: username,
+    });
+
+    const updatedChats = await invoke<Chat[]>("print_messages", { path: null });
+    console.log("Updated chats after new chat:", updatedChats);
+    setChats(updatedChats);
+  } catch (error) {
+    console.error("Failed to create new chat:", error);
+    alert("Error creating new chat: " + error);
+  }
+};
 
   return (
     <div className="d-flex vh-100">

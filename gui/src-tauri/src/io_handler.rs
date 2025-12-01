@@ -81,6 +81,38 @@ pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), S
     Ok(())
 }
 
+#[tauri::command]
+fn new_chat(chat_name: String) -> Result<(), String> {
+    use std::fs::OpenOptions;
+    use std::io::Write;
+
+    let dir_path = "../app_data/cache";
+    let file_path = format!("{}/chat_history.json", dir_path);
+
+    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
+
+    let mut chats = read_chats_from_json(&file_path);
+
+    chats.push(Chat {
+        name: chat_name,
+        messages: vec![],
+    });
+
+    let json = serde_json::to_string_pretty(&chats).map_err(|e| e.to_string())?;
+
+    let mut file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(file_path)
+        .map_err(|e| e.to_string())?;
+
+    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
 fn read_chats_from_json(path: &str) -> Vec<Chat> {
     use std::fs::File;
     use std::io::Read;
