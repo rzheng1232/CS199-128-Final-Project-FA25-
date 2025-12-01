@@ -52,12 +52,23 @@ function ChatApp({ currentUser }: Props) {
     }
   };
 
+  const handleNewChat = async (username: string) => {
+    setActiveChat(username);
+    invoke("log_message", {
+      chatName: username,
+      user: "Len",
+      message: "",
+    });
+    invoke<Chat[]>("print_messages", { path: null });
+  };
+
   return (
     <div className="d-flex vh-100">
       <Sidebar
         chats={chats}
         activeChat={activeChat}
         handleChatClick={handleClick}
+        onNewChat={handleNewChat}
       />
       <div className="flex-grow-1 d-flex flex-column">
         <ChatWindow
