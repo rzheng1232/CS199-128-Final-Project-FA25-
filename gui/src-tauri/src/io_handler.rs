@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fs::create_dir_all;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 
@@ -44,10 +45,10 @@ pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), S
     use std::fs::OpenOptions;
     use std::io::Write;
 
-    let dir_path = "./cache";
+    let dir_path = "../app_data/cache";
     let file_path = format!("{}/chat_history.json", dir_path);
 
-    fs::create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
+    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
 
     let mut chats = read_chats_from_json(&file_path);
 
@@ -95,7 +96,7 @@ fn read_chats_from_json(path: &str) -> Vec<Chat> {
 
 #[tauri::command]
 pub fn print_messages(path: Option<String>) -> Result<Vec<Chat>, String> {
-    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string());
+    let path = path.unwrap_or_else(|| "../app_data/cache/chat_history.json".to_string());
 
     let chats = read_chats_from_json(&path);
 
@@ -104,7 +105,7 @@ pub fn print_messages(path: Option<String>) -> Result<Vec<Chat>, String> {
 
 #[tauri::command]
 pub fn clear_messages(path: Option<String>) -> Result<(), String> {
-    let path = path.unwrap_or_else(|| "./cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
+    let path = path.unwrap_or_else(|| "../app_data/cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
     let mut file = File::create(&path).map_err(|e| e.to_string())?;
     file.write_all(b"[]").map_err(|e| e.to_string())?;
     Ok(())

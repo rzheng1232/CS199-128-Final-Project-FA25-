@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { Chat } from "../types";
 
 type SideBarProps = {
