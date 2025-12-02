@@ -20,33 +20,68 @@ function LoginScreen({ onLoginSuccess }: Props) {
         }
     }
 
-     async function tryRegister() {
-    const username = (document.getElementById("user") as HTMLInputElement).value.trim();
-    const password = (document.getElementById("pass") as HTMLInputElement).value;
-    try {
-      await invoke<string>("register", { username, password }); // call your register command here
-      // optionally auto‑login after registration:
-      onLoginSuccess(username);
-    } catch (error: any) {
-      alert("Could not register user");
+    async function tryRegister() {
+        const username = (document.getElementById("user") as HTMLInputElement).value.trim();
+        const password = (document.getElementById("pass") as HTMLInputElement).value;
+        try {
+            await invoke<string>("register", { username, password }); // call your register command here
+            // optionally auto‑login after registration:
+            onLoginSuccess(username);
+        } catch (error: any) {
+            alert("Could not register user");
+        }
     }
-  }
 
     return (
-        <div className="login-container">
-            <h1>Chat Server</h1>
-            <p>Enter username and password</p>
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+            <div className="w-full max-w-sm rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl px-6 py-8">
+                <h1 className="text-2xl font-semibold text-white text-center">Chat Server</h1>
+                <p className="mt-2 text-sm text-slate-400 text-center">
+                    Enter username and password
+                </p>
 
-            <input id="user" className="login-input" placeholder="Username" />
-            <input id="pass" className="login-input" type="password" placeholder="Password" />
+                <form onSubmit={tryLogin} className="mt-6 space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-200">
+                            Username
+                        </label>
+                        <input
+                            id="user"
+                            className="mt-1 block w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Username"
+                        />
+                    </div>
 
-            <button onClick={tryLogin} className="login-button">
-                Log In
-            </button>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-200">
+                            Password
+                        </label>
+                        <input
+                            id="pass"
+                            type="password"
+                            className="mt-1 block w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Password"
+                        />
+                    </div>
 
-            <button onClick={tryRegister} className="register-button">
-                Register
-            </button>
+                    <button
+                        type="submit"
+                        className="mt-2 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 active:bg-indigo-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                    >
+                        Sign in
+                    </button>
+                </form>
+
+                <p className="mt-6 text-center text-sm text-slate-400">
+                    Don't have an account?{" "}
+                    <button
+                        type="button"
+                        onClick={tryRegister}
+                        className="font-semibold text-indigo-400 hover:text-indigo-300">
+                        Register
+                    </button>
+                </p>
+            </div>
         </div>
     );
 
