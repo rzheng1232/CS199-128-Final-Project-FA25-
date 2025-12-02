@@ -7,7 +7,7 @@ type ChatWindowProps = {
 
 function ChatWindow({ chat }: ChatWindowProps): JSX.Element {
   if (!chat) {
-    return <div className="p-3">Please Select a Chat</div>;
+    return <div className="p-3">Please select a chat from the sidebar.</div>;
   }
   return (
     <div
