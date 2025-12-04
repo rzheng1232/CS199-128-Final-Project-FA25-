@@ -31,7 +31,7 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
           Chat Server
         </h1>
         <p className="mt-2 text-sm text-slate-400 text-center">
-          Enter username and password
+          Login with username and password
         </p>
 
         <form onSubmit={tryLogin} className="mt-6 space-y-4">

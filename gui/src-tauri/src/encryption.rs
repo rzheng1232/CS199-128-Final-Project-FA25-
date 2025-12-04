@@ -40,6 +40,15 @@ fn decrypt_string(encrypted: &[u8], private_key: &RsaPrivateKey) -> String {
     convert_to_string(&decrypted_bytes)
 }
 
+/// Generates public and private keys
+fn generate_keys() -> (RsaPrivateKey, RsaPublicKey) {
+    let mut rng = OsRng;
+    let bits = 2048;
+    let priv_key = RsaPrivateKey::new(&mut rng, bits).expect("Key Generation");
+    let pub_key = RsaPublicKey::from(&priv_key);
+    (priv_key, pub_key)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -47,18 +56,10 @@ mod test {
     use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
     use sha2::Sha256;
 
-    fn generate_keys() -> (RsaPrivateKey, RsaPublicKey) {
-        let mut rng = OsRng;
-        let bits = 2048;
-        let priv_key = RsaPrivateKey::new(&mut rng, bits).expect("Key Generation");
-        let pub_key = RsaPublicKey::from(&priv_key);
-        (priv_key, pub_key)
-    }
-
     #[test]
     fn test_encrypt() {
         let (_priv, pubk) = generate_keys();
-        let message = b"Encrypt Test Message"; // Testing directly on a byte string 
+        let message = b"Encrypt Test Message"; // Testing directly on a byte string
         let mut rng = OsRng;
         let padding = Oaep::new::<Sha256>();
         let encrypted = pubk
@@ -70,7 +71,7 @@ mod test {
     #[test]
     fn test_decrypt() {
         let (privk, pubk) = generate_keys();
-        let message = b"Decrypt Test Message"; // Testing directly on a byte string 
+        let message = b"Decrypt Test Message"; // Testing directly on a byte string
         let mut rng = OsRng;
         let padding = Oaep::new::<Sha256>();
         let encrypted = pubk
