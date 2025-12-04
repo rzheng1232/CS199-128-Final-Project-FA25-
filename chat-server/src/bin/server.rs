@@ -55,6 +55,7 @@ async fn main() -> Result<(), sqlx::Error>{
         .route("/createchat", get(new_chat))
         .route("/newmessage/chatname/{chat}/username/{user}", post(incoming_message))
         .route("/getchat/chatname/{chat}", get(get_message_history))
+        .route(/getallusers/)
         .with_state(pool.clone());
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
