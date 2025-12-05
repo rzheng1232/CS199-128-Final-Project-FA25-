@@ -17,7 +17,7 @@ function App() {
         }}
         onLoginPress={() => {
           setShowRegister(false);
-          console.log("Switched to Login");
+          console.log("Switched to login");
         }}
       />
     );

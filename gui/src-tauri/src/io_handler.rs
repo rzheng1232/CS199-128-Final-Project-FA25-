@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
+use reqwest::Error;
 
 // user stuff
 #[derive(Clone, Hash)]
