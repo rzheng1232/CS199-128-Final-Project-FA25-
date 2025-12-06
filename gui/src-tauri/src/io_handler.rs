@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::create_dir_all;
-use std::fs::{File, OpenOptions};
+use std::fs::{File};
 use std::io::Write;
 
 // user stuff

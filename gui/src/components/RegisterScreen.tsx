@@ -8,19 +8,27 @@ type Props = {
 };
 
 function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
-  async function tryRegister() {
+  async function tryRegister(e: React.FormEvent) {
+    e.preventDefault();
     const username = (
       document.getElementById("user") as HTMLInputElement
     ).value.trim();
     const password = (document.getElementById("pass") as HTMLInputElement)
       .value;
     try {
-      const result = await invoke<string>("register", { username, password });
-      console.log("Register success:", result);
-      onRegisterSuccess(username);
-    } catch (error: any) {
-      console.error("Register failed:", error);
-      alert("Wrong username or password");
+      // login returns 0 or 1
+      const result = await invoke<number>("login", { user: username, pass: password });
+
+      if (result === 1) {
+        console.log("Login success");
+        onRegisterSuccess(username);
+      } else {
+        console.log("Login failed (0 from backend)");
+        alert("Wrong username or password");
+      }
+    } catch (error) {
+      console.error("Login call failed:", error);
+      alert("Login error (backend unreachable)");
     }
   }
 

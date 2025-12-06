@@ -23,6 +23,8 @@ function SideBar({
   const handleNewChat = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim()) {
+      // check if it exists
+      
       onNewChat(username.trim());
       setUsername("");
     }

@@ -8,20 +8,29 @@ type Props = {
 };
 
 function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
-  async function tryLogin() {
+  async function tryLogin(e: React.FormEvent) {
+    e.preventDefault();
     const username = (
       document.getElementById("user") as HTMLInputElement
     ).value.trim();
     const password = (document.getElementById("pass") as HTMLInputElement)
       .value;
     try {
-      const result = await invoke<string>("login", { username, password });
-      console.log("Login success:", result);
-      onLoginSuccess(username);
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      alert("Wrong username or password");
+      // login returns 0 or 1
+      const result = await invoke<number>("login", { user: username, pass: password });
+
+      if (result === 1) {
+        onLoginSuccess(username);   // this is what flips you to ChatApp
+      } else {
+        alert("Wrong username or password");
+      }
+    } catch (error) {
+      console.error("Login call failed:", error);
+      alert("Login error (backend unreachable)");
     }
+
+
+
   }
 
   return (

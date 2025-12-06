@@ -1,40 +1,41 @@
 
 import { useState } from "react";
-import LoginScreen from "./components/LoginScreen"; 
+import LoginScreen from "./components/LoginScreen";
 import RegisterScreen from "./components/RegisterScreen";
 import ChatApp from "./ChatApp";           // chat
 
 function App() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [showRegister, setShowRegister] = useState(true);
+  const [showRegister, setShowRegister] = useState(false);
 
   if (!currentUser) {
-  if (showRegister) {
+    if (showRegister) {
+      return (
+        <RegisterScreen
+          onRegisterSuccess={(username: string) => {
+            setCurrentUser(username);
+          }}
+          onLoginPress={() => {
+            setShowRegister(false);
+            console.log("Switched to Login");
+          }}
+        />
+      );
+    }
+
     return (
-      <RegisterScreen
-        onRegisterSuccess={(username: string) => {
+      <LoginScreen
+        onLoginSuccess={(username: string) => {
           setCurrentUser(username);
+          
         }}
-        onLoginPress={() => {
-          setShowRegister(false);
-          console.log("Switched to Login");
+        onRegisterPress={() => {
+          setShowRegister(true);
+          console.log("Switched to register");
         }}
       />
     );
   }
-
-  return (
-    <LoginScreen
-      onLoginSuccess={(username: string) => {
-        setCurrentUser(username);
-      }}
-      onRegisterPress={() => {
-        setShowRegister(true);
-        console.log("Switched to register");
-      }}
-    />
-  );
-}
 
   return <ChatApp currentUser={currentUser} />;
 }
