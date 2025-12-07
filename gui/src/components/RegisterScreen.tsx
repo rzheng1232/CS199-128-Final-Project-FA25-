@@ -1,6 +1,5 @@
 import React from "react";
-import { invoke } from "@tauri-apps/api/core"; //
-import LoginScreen from "./LoginScreen";
+import { invoke } from "@tauri-apps/api/core"; 
 
 type Props = {
   onRegisterSuccess: (username: string) => void;

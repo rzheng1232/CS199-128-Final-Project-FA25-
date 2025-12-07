@@ -1,33 +1,46 @@
 import { JSX } from "react";
-import { Chat } from "../types";
 
-type ChatWindowProps = {
-  chat: Chat | null;
+type Message = {
+  user: string;
+  message: string;
+  timestamp: string;
 };
 
-function ChatWindow({ chat }: ChatWindowProps): JSX.Element {
-  if (!chat) {
-    return <div className="p-3">Please select a chat from the sidebar.</div>;
-  }
+type ChatWindowProps = {  // ← Fixed: type → type ChatWindowProps = {
+  messages: Message[];
+  currentUser: string;
+};
+
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, currentUser }) => {  // ← Fixed: Props → ChatWindowProps
   return (
     <div
-      className="flex-grow-1 bg-light p-3 bg-light"
+      className="flex-grow-1 bg-light p-3"
       style={{ height: "100vh", overflowY: "auto" }}
     >
-      <h1 className="p3 border-bottom">Chat with {chat.name}</h1>
-      {chat.messages.map((msg, idx) => (
-        <div key={idx} style={{ marginBottom: "1em" }}>
-          <div>
-            <strong>{msg.user}:</strong>
-            {msg.message}
+      <h1 className="p3 border-bottom">Selected Chat:</h1>  {/* ← Fixed: no chat.name */}
+      {messages.length === 0 ? (
+        <div className="p-3 text-muted">No messages yet. Say hello!</div>
+      ) : (
+        messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`p-2 mb-2 rounded-lg max-w-md w-fit ${msg.user === currentUser
+                ? "bg-sky-300 text-white ml-auto"      // YOU = light blue, aligned right
+                : "bg-orange-400 text-black mr-auto"   // THEM = orange, aligned left
+              }`}
+            style={{ marginBottom: "1em" }}
+          >
+            <div>
+              <strong>{msg.user}:</strong> {msg.message}
+            </div>
+            <div style={{ fontSize: "0.8em", color: "#888" }}>
+              {new Date(msg.timestamp).toLocaleTimeString()}
+            </div>
           </div>
-          <div style={{ fontSize: "0.8em", color: "#888" }}>
-            {msg.timestamp}
-          </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
-}
+};
 
 export default ChatWindow;

@@ -2,7 +2,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::create_dir_all;
-use std::fs::{File};
+use std::fs::read_dir;
+use std::fs::File;
+use std::io::Read;
 use std::io::Write;
 
 // user stuff
@@ -39,84 +41,7 @@ pub fn display_message(message: &str) {
     }
 }
 
-// save chat
-#[tauri::command]
-pub fn log_message(chat_name: String, user: &str, message: &str) -> Result<(), String> {
-    use std::fs::OpenOptions;
-    use std::io::Write;
-
-    let dir_path = "../app_data/cache";
-    let file_path = format!("{}/chat_history.json", dir_path);
-
-    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
-
-    let mut chats = read_chats_from_json(&file_path);
-
-    let new_message = Message {
-        user: user.to_string(),
-        message: message.to_string(),
-        timestamp: Utc::now(),
-    };
-
-    if let Some(chat) = chats.iter_mut().find(|c| c.name == chat_name) {
-        chat.messages.push(new_message);
-    } else {
-        chats.push(Chat {
-            name: chat_name,
-            messages: vec![new_message],
-        });
-    }
-
-    let json = serde_json::to_string_pretty(&chats).map_err(|e| e.to_string())?;
-
-    let mut file = OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(file_path)
-        .map_err(|e| e.to_string())?;
-
-    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
-
-    Ok(())
-}
-
-#[tauri::command]
-fn new_chat(chat_name: String) -> Result<(), String> {
-    use std::fs::OpenOptions;
-    use std::io::Write;
-
-    let dir_path = "../app_data/cache";
-    let file_path = format!("{}/chat_history.json", dir_path);
-
-    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
-
-    let mut chats = read_chats_from_json(&file_path);
-
-    chats.push(Chat {
-        name: chat_name,
-        messages: vec![],
-    });
-
-    let json = serde_json::to_string_pretty(&chats).map_err(|e| e.to_string())?;
-
-    let mut file = OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(file_path)
-        .map_err(|e| e.to_string())?;
-
-    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
-
-    Ok(())
-}
-
-#[tauri::command]
-fn read_chats_from_json(path: &str) -> Vec<Chat> {
-    use std::fs::File;
-    use std::io::Read;
-
+fn read_messages_from_chat_json(path: &str) -> Vec<Message> {
     if let Ok(mut file) = File::open(path) {
         let mut contents = String::new();
         if file.read_to_string(&mut contents).is_ok() {
@@ -124,6 +49,83 @@ fn read_chats_from_json(path: &str) -> Vec<Chat> {
         }
     }
     Vec::new()
+}
+
+fn read_chats_from_json(path: &str) -> Vec<Chat> {
+    if let Ok(mut file) = File::open(path) {
+        let mut contents = String::new();
+        if file.read_to_string(&mut contents).is_ok() {
+            return serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
+        }
+    }
+    Vec::new()
+}
+
+#[tauri::command]
+pub fn list_chats() -> Result<Vec<String>, String> {
+    let dir_path = "../app_data/cache";
+    let path = std::path::Path::new(dir_path);
+
+    if !path.exists() {
+        return Ok(vec![]);
+    }
+
+    let chats: Vec<String> = read_dir(dir_path)
+        .map_err(|e| e.to_string())?
+        .filter_map(|entry| {
+            let file_name = entry.ok()?.file_name().into_string().ok()?;
+            if file_name.ends_with(".json") {
+                Some(file_name.trim_end_matches(".json").to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    Ok(chats)
+}
+
+// save chat
+#[tauri::command]
+pub fn log_message(users: Vec<String>, user: String, message: String) -> Result<(), String> {
+    let chat_filename = chat_filename(&users);
+    let dir_path = "../app_data/cache";
+    let file_path = format!("{}/{}", dir_path, chat_filename);
+
+    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
+
+    let mut messages = read_messages_from_chat_json(&file_path);
+    messages.push(Message {
+        user,
+        message,
+        timestamp: Utc::now(),
+    });
+
+    let json = serde_json::to_string_pretty(&messages).map_err(|e| e.to_string())?;
+
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(&file_path)
+        .map_err(|e| e.to_string())?;
+
+    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_chat_messages(users: Vec<String>) -> Result<Vec<Message>, String> {
+    let chat_filename = chat_filename(&users);
+    let file_path = format!("../app_data/cache/{}", chat_filename);
+    Ok(read_messages_from_chat_json(&file_path))
+}
+
+fn chat_filename(users: &[String]) -> String {
+    let mut sorted = users.to_vec(); // Fixed
+    sorted.sort();
+    format!("{}.json", sorted.join("_"))
 }
 
 #[tauri::command]

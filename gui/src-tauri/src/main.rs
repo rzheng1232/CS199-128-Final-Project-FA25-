@@ -6,8 +6,10 @@ mod io_handler;
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
+            io_handler::log_message,      // ← ADD
+            io_handler::get_chat_messages, // ← ADD  
+            io_handler::list_chats,       // ← ADD
             io_handler::print_messages,
-            io_handler::log_message,
             io_handler::clear_messages,
             commands::login,
             commands::register

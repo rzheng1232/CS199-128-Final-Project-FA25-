@@ -55,3 +55,5 @@ pub async fn register(user: String, pass: String) -> Result<i32, ()> {
         _ => Ok(0),
     }
 }
+
+
