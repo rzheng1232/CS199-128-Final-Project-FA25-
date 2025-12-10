@@ -12,8 +12,8 @@ type Message = {
   timestamp: string;
 };
 
-interface Props {  // or ChatWindowProps - whatever you called it
-  messages: Message[];
+type ChatAppProps = {
+  // messages: Message[];
   currentUser: string;
 }
 
@@ -23,80 +23,90 @@ type ChatInfo = {
   users: string[];
 }
 
-function ChatApp({ currentUser }: Props) {
-  const [activeChat, setActiveChat] = useState<string | null>(null); // "alice_bob"
-  const [chats, setChats] = useState<ChatInfo[]>([]); // List of chat IDs
-  const [messages, setMessages] = useState<Message[]>([]); // Active chat messages
+function ChatApp({ currentUser }: ChatAppProps) {
+  const [activeChat, setActiveChat] = useState<string | null>(null);
+  const [chats, setChats] = useState<ChatInfo[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // Load all chats on startup
+  async function refreshChats() {
+    try {
+      const updatedChats = await invoke<ChatInfo[]>("list_chats", { user: currentUser });
+      setChats(updatedChats);
+    } catch (err) {
+      console.error("Failed to refresh chats:", err);
+    }
+  }
+
   useEffect(() => {
-    invoke<string[]>("list_chats", {})
-      .then((chatIds) => {
-        console.log("Chats loaded:", chatIds);
-        setChats(chatIds.map(id => ({ id, users: id.split('_') })));
-      })
-      .catch((err) => {
-        console.log("No chats yet - Tauri command not ready");  // ← Graceful fail
-        setChats([]);  // ← Set empty array so UI doesn't break
-      });
-  }, []);
+    refreshChats();
+    const intervalId = setInterval(refreshChats, 5000); // r4efresh every 5s
+    return () => clearInterval(intervalId);
+  }, [currentUser]);
+
+
 
   // Load messages when activeChat changes
   useEffect(() => {
     if (!activeChat) return;
 
+    // Find the chat object from the chats array
+    const current = chats.find(c => c.id === activeChat);
+    if (!current) return;
+
     invoke<Message[]>("get_chat_messages", {
-      users: activeChat.split('_').sort()
+      users: current.users
     })
       .then(setMessages)
       .catch(console.error);
-  }, [activeChat]);
-
-  const handleSend = async (text: string) => {
-    if (!activeChat || !text.trim()) return;
-
-    const chatUsers = activeChat.split('_').sort();
-
-    try {
-      await invoke("log_message", {
-        users: chatUsers,
-        user: currentUser as string,
-        message: text.trim(),
-      });
-
-      // Reload messages for this chat
-      const updatedMessages = await invoke<Message[]>("get_chat_messages", {
-        users: chatUsers
-      });
-      setMessages(updatedMessages);
-    } catch (error) {
-      console.error("Failed to send:", error);
-      alert("Error sending message: " + error);
-    }
-  };
+  }, [activeChat, chats]);
+  
+  const onNewChatDone = async () => {
+    await refreshChats();
+  }
 
 
   const handleNewChat = async (username: string) => {
     if (!username || username === currentUser) return;
 
-    const chatId = [currentUser, username].sort().join('_');
+    const chatId = currentUser + username;
 
     try {
-      // Create chat with both users
-      await invoke("log_message", {
-        users: [currentUser as string, username],
-        user: currentUser as string,
-        message: ``,
+      await invoke("new_chat", {
+        name: chatId,
+        user: [currentUser, username],
       });
 
+      await refreshChats();
       setActiveChat(chatId);
-      // Refresh chats list
-      const updatedChats = await invoke<string[]>("list_chats", {});
-      setChats(updatedChats.map(id => ({ id, users: id.split('_') })));
     } catch (error) {
       console.error("Failed to create new chat:", error);
     }
   };
+
+
+
+  const handleSend = async (text: string) => {
+    if (!activeChat) return;
+
+    try {
+      await invoke("log_message", {
+        users: activeChat.split("_"),
+        user: currentUser,
+        message: text,
+      });
+
+      const msgs = await invoke<Message[]>("get_chat_messages", {
+        users: activeChat.split("_").sort(),
+      });
+      setMessages(msgs);
+
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    }
+  };
+
+
 
   const handleClick = (chatId: string) => {
     console.log(`Clicked on ${chatId}`);
@@ -112,9 +122,10 @@ function ChatApp({ currentUser }: Props) {
         handleChatClick={handleClick}
         onNewChat={handleNewChat}
         currentUser={currentUser}
+        onNewChatDone={onNewChatDone}
       />
       <div className="flex-grow-1 d-flex flex-column">
-        <ChatWindow          // ← Fixed typo
+        <ChatWindow  
           messages={messages}
           currentUser={currentUser}
         />

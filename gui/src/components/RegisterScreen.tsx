@@ -1,5 +1,5 @@
 import React from "react";
-import { invoke } from "@tauri-apps/api/core"; 
+import { invoke } from "@tauri-apps/api/core";
 
 type Props = {
   onRegisterSuccess: (username: string) => void;
@@ -16,18 +16,18 @@ function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
       .value;
     try {
       // login returns 0 or 1
-      const result = await invoke<number>("login", { user: username, pass: password });
+      const result = await invoke<number>("register", { user: username, pass: password });
 
       if (result === 1) {
-        console.log("Login success");
+        console.log("Register success");
         onRegisterSuccess(username);
       } else {
-        console.log("Login failed (0 from backend)");
-        alert("Wrong username or password");
+        console.log("Register failed (0 from backend)");
+        alert("Username is taken");
       }
     } catch (error) {
-      console.error("Login call failed:", error);
-      alert("Login error (backend unreachable)");
+      console.error("Register call failed:", error);
+      alert("Register error (backend unreachable)");
     }
   }
 

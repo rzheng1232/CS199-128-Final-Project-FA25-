@@ -17,6 +17,7 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
     try {
       // login returns 0 or 1
       const result = await invoke<number>("login", { user: username, pass: password });
+      console.log(result);
 
       if (result === 1) {
         onLoginSuccess(username);   // this is what flips you to ChatApp

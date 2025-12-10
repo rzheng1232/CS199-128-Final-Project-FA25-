@@ -6,12 +6,12 @@ type Message = {
   timestamp: string;
 };
 
-type ChatWindowProps = {  // ← Fixed: type → type ChatWindowProps = {
+type ChatWindowProps = { 
   messages: Message[];
   currentUser: string;
 };
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, currentUser }) => {  // ← Fixed: Props → ChatWindowProps
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, currentUser }) => { 
   return (
     <div
       className="flex-grow-1 bg-light p-3"

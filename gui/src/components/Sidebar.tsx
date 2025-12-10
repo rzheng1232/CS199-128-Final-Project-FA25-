@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { JSX, useState } from "react";
 
 // KEEP & FIX THIS:
@@ -7,6 +8,7 @@ type SideBarProps = {
   handleChatClick: (chatName: string) => void;
   onNewChat: (username: string) => void;
   currentUser: string;
+  onNewChatDone: () => void;
 };
 
 type ChatInfo = {
@@ -20,23 +22,37 @@ function SideBar({
   handleChatClick,
   onNewChat,
   currentUser,
+  onNewChatDone
 }: SideBarProps): JSX.Element {
   const [username, setUsername] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
+
   const handleNewChat = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedUsername = username.trim();
+    const result = await invoke<number>("handleNewChat", { currentUser: currentUser, user: trimmedUsername });
+    console.log(result);
 
+    if (result === 1) {
+      // onNewChat(trimmedUsername);
+      await onNewChatDone();
+      setUsername("");
+    } else {
+      alert("User does not exist");
+    }
+
+
+
+    /*
     if (!trimmedUsername) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:3000/checkusername/${encodeURIComponent(trimmedUsername)}`);
+      const response = await fetch(`http://44.192.82.24/checkuser/username/${encodeURIComponent(trimmedUsername)}`);
       const result = await response.json();
 
-      // Proceed only if user exists on server
       if (result.Ok === true) {
         onNewChat(trimmedUsername);
         setUsername("");
@@ -47,7 +63,7 @@ function SideBar({
       console.warn("Server check failed, creating chat anyway for testing", error);
       onNewChat(trimmedUsername);
       setUsername("");
-    }
+    } */
   };
 
 
@@ -62,7 +78,7 @@ function SideBar({
 
       <ul className="list-none p-0 m-0 space-y-1">
         {chats.map((chat) => {
-          const others = chat.users.filter(u => u !== currentUser);
+          const others = (chat.users || []).filter(u => u !== currentUser);
           const label = others.join(", ");
 
           return (
