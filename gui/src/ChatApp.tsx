@@ -60,7 +60,7 @@ function ChatApp({ currentUser }: ChatAppProps) {
       .then(setMessages)
       .catch(console.error);
   }, [activeChat, chats]);
-  
+
   const onNewChatDone = async () => {
     await refreshChats();
   }
@@ -125,7 +125,7 @@ function ChatApp({ currentUser }: ChatAppProps) {
         onNewChatDone={onNewChatDone}
       />
       <div className="flex-grow-1 d-flex flex-column">
-        <ChatWindow  
+        <ChatWindow
           messages={messages}
           currentUser={currentUser}
         />
