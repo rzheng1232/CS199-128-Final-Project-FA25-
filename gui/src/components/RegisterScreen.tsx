@@ -1,25 +1,25 @@
 import React from "react";
 import { invoke } from "@tauri-apps/api/core"; //
-import RegisterScreen from "./RegisterScreen";
+import LoginScreen from "./LoginScreen";
 
 type Props = {
-  onLoginSuccess: (username: string) => void;
-  onRegisterPress: () => void;
+  onRegisterSuccess: (username: string) => void;
+  onLoginPress: () => void;
 };
 
-function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
-  async function tryLogin() {
+function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
+  async function tryRegister() {
     const username = (
       document.getElementById("user") as HTMLInputElement
     ).value.trim();
     const password = (document.getElementById("pass") as HTMLInputElement)
       .value;
     try {
-      const result = await invoke<string>("login", { username, password });
-      console.log("Login success:", result);
-      onLoginSuccess(username);
+      const result = await invoke<string>("register", { username, password });
+      console.log("Register success:", result);
+      onRegisterSuccess(username);
     } catch (error: any) {
-      console.error("Login failed:", error);
+      console.error("Register failed:", error);
       alert("Wrong username or password");
     }
   }
@@ -31,10 +31,10 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
           Chat Server
         </h1>
         <p className="mt-2 text-sm text-slate-400 text-center">
-          Login with username and password
+          Enter username and password
         </p>
 
-        <form onSubmit={tryLogin} className="mt-6 space-y-4">
+        <form onSubmit={tryRegister} className="mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-200">
               Username
@@ -62,21 +62,21 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
             type="submit"
             className="mt-2 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 active:bg-indigo-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >
-            Log in
+            Register
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-400">
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <button
             type="button"
             onClick={() => {
               console.log("button has been pressed");
-              onRegisterPress();
+              onLoginPress();
             }}
             className="font-semibold text-indigo-400 hover:text-indigo-300"
           >
-            Register
+            Login
           </button>
         </p>
       </div>
@@ -84,4 +84,4 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
   );
 }
 
-export default LoginScreen;
+export default RegisterScreen;

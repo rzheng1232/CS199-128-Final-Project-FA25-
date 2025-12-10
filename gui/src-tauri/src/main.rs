@@ -1,26 +1,43 @@
-
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
- use std::collections::HashMap;
+use std::collections::HashMap;
 extern crate tauri;
 use reqwest::Error;
+use tauri::command;
 
 mod io_handler;
 
-#[tauri::command]
-async fn login(username: String, password: String) -> Result<String, String> {
-    println!("Login attempt: '{}' / '{}'", username, password);
+#[command]
+async fn login(user: String, pass: String) -> Result<i32, String> {
+    let url = format!("http://98.93.98.244/Authenticate/username/{}/password/{}", user, pass);
+    let resp = reqwest::get(&url)
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
     
-     //     query 
-
- return Ok("Login successful!".to_string());
-
+    let resp_text = resp.text()
+        .await
+        .map_err(|e| format!("Response failed: {}", e))?;
+    
+    match resp_text.trim().parse::<i32>() {
+        Ok(1) => Ok(1),
+        _ => Ok(0),
+    }
 }
 
-#[tauri::command]
-async fn register(username: String, password: String) -> Result<String, String> {
-    println!("Register attempt: '{}' / '{}'", username, password);
-
-    return Ok("Registration successful!".to_string());
+#[command]
+async fn register(user: String, pass: String) -> Result<i32, String> {
+    let url = format!("http://98.93.98.244/createaccount/username/{}/password/{}", user, pass);
+    let resp = reqwest::get(&url)
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    
+    let resp_text = resp.text()
+        .await
+        .map_err(|e| format!("Response failed: {}", e))?;
+    
+    match resp_text.trim().parse::<i32>() {
+        Ok(1) => Ok(1),
+        _ => Ok(0),
+    }
 }
 
 fn main() {
@@ -35,4 +52,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }
-
