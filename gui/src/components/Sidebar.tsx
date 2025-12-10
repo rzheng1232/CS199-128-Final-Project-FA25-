@@ -3,7 +3,7 @@ import { JSX, useState } from "react";
 
 // KEEP & FIX THIS:
 type SideBarProps = {
-  chats: ChatInfo[];        // ← CHANGE Chat[] to ChatInfo[]
+  chats: ChatInfo[];
   activeChat: string | null;
   handleChatClick: (chatName: string) => void;
   onNewChat: (username: string) => void;
@@ -33,38 +33,60 @@ function SideBar({
   const handleNewChat = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedUsername = username.trim();
-    const result = await invoke<number>("handleNewChat", { currentUser: currentUser, user: trimmedUsername });
-    console.log(result);
 
-    if (result === 1) {
-      // onNewChat(trimmedUsername);
-      await onNewChatDone();
+    // Validate input
+    if (!trimmedUsername || trimmedUsername === currentUser) {
       setUsername("");
-    } else {
-      alert("User does not exist");
+      return;
     }
 
+    // Check if chat already exists (by users array)
+    const alreadyExists = chats.some((chat) => {
+      const users = chat.users || [];
+      return (
+        users.includes(currentUser) &&
+        users.includes(trimmedUsername) &&
+        users.length === 2
+      );
+    });
 
+    if (alreadyExists) {
+      // Switch to existing chat instead of creating new one
+      const existingChat = chats.find((chat) => {
+        const users = chat.users || [];
+        return (
+          users.includes(currentUser) &&
+          users.includes(trimmedUsername) &&
+          users.length === 2
+        );
+      });
+      if (existingChat) {
+        handleChatClick(existingChat.id);
+      }
+      setUsername("");
+      return;
+    }
 
-    /*
-    if (!trimmedUsername) return;
-
+    // Create new chat via backend
     try {
-      const response = await fetch(`http://44.192.82.24/checkuser/username/${encodeURIComponent(trimmedUsername)}`);
-      const result = await response.json();
+      const result = await invoke<number>("handleNewChat", {
+        currentUser,
+        user: trimmedUsername
+      });
+      console.log("handleNewChat result:", result);
 
-      if (result.Ok === true) {
-        onNewChat(trimmedUsername);
+      if (result === 1) {
+        await onNewChatDone();
         setUsername("");
       } else {
-        alert(`User "${trimmedUsername}" does not exist.`);
+        alert("User does not exist");
       }
     } catch (error) {
-      console.warn("Server check failed, creating chat anyway for testing", error);
-      onNewChat(trimmedUsername);
-      setUsername("");
-    } */
+      console.error("Failed to create chat:", error);
+      alert("Failed to create chat. Please try again.");
+    }
   };
+
 
 
 
