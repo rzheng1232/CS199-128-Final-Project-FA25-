@@ -92,7 +92,11 @@ pub fn log_message(users: Vec<String>, user: String, message: String) -> Result<
 }
 
 #[tauri::command]
-pub fn get_chat_messages(users: Vec<String>) -> Result<Vec<Message>, String> {
+pub fn get_chat_messages(id: String, users: Vec<String>) -> Result<Vec<Message>, String> {
+    let url = format!(
+        "http://44.192.82.241/getchat/chatname/ChatName",
+        user
+    );
     let chat_filename = chat_filename(&users);
     let file_path = format!("../app_data/cache/{}", chat_filename);
     Ok(read_messages_from_chat_json(&file_path))

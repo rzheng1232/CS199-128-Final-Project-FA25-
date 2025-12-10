@@ -55,7 +55,7 @@ function ChatApp({ currentUser }: ChatAppProps) {
     if (!current) return;
 
     invoke<Message[]>("get_chat_messages", {
-      users: current.users
+      id: current.id,users: current.users
     })
       .then(setMessages)
       .catch(console.error);
