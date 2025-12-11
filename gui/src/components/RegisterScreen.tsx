@@ -1,6 +1,5 @@
-import React from "react";
-import { invoke } from "@tauri-apps/api/core"; //
-import LoginScreen from "./LoginScreen";
+import React, { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 type Props = {
   onRegisterSuccess: (username: string) => void;
@@ -8,19 +7,35 @@ type Props = {
 };
 
 function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
-  async function tryRegister() {
-    const username = (
-      document.getElementById("user") as HTMLInputElement
-    ).value.trim();
-    const password = (document.getElementById("pass") as HTMLInputElement)
-      .value;
+  const [error, setError] = useState<string>("");
+  async function tryRegister(e: React.FormEvent) {
+    e.preventDefault();
+    setError(""); // always clear old error first
+
+    const usernameInput = document.getElementById("user") as HTMLInputElement;
+    const passwordInput = document.getElementById("pass") as HTMLInputElement;
+
+    const username = usernameInput?.value.trim() || "";
+    const password = passwordInput?.value || "";
+
+    if (!username || !password) {
+      setError("Please fill in both username and password");
+      return;
+    }
+
     try {
-      const result = await invoke<string>("register", { username, password });
-      console.log("Register success:", result);
+      const result = await invoke<number>("register", { user: username, pass: password });
+
+      if (result === 0) {
+        setError("Username already taken");
+        return;
+      }
+
       onRegisterSuccess(username);
-    } catch (error: any) {
-      console.error("Register failed:", error);
-      alert("Wrong username or password");
+
+    } catch (error) {
+      console.error("Register call failed:", error);
+      alert("Register error (backend unreachable)");
     }
   }
 
@@ -28,7 +43,7 @@ function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl px-6 py-8">
         <h1 className="text-2xl font-semibold text-white text-center">
-          Illini Chat
+          Illini.Chat
         </h1>
         <p className="mt-2 text-sm text-slate-400 text-center">
           Register with username and password
@@ -58,13 +73,22 @@ function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
             />
           </div>
 
+
+
+          {error && (
+            <div className="p-4 rounded-lg bg-red-500/50 border border-red-800 text-red-300 text-center text-sm font-medium">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
-            className="mt-2 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 active:bg-indigo-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            className="mt-1 flex w-full justify-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 active:bg-indigo-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >
             Register
           </button>
         </form>
+
 
         <p className="mt-6 text-center text-sm text-slate-400">
           Already have an account?{" "}

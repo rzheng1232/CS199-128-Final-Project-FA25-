@@ -1,5 +1,9 @@
 # CS199-128-Final-Project-FA25-
 
+## Run Instructions
+
+Find detailed ryb instructions in the [Run Instructions](RUN.md).
+
 ## Group Name
 
 Ryan Mia Len
