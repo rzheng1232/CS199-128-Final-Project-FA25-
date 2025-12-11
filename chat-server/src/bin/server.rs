@@ -12,6 +12,8 @@ use argon2::{
 };use sqlx::{query, SqlitePool};
 use chrono;
 use tokio;
+use axum::http::StatusCode;
+
 
 // Things the central sever processor needs to handle:
 //    User prescence: Whether a user is currently online or not
@@ -35,6 +37,19 @@ struct CreateChatParams {
     user: Vec<String>, // ?user=alice&user=bob → vec!["alice", "bob"]
 }
 
+#[derive(Deserialize)]
+struct CacheUpdate {
+    messages: Vec<ChatHistoryMessage>,
+}
+
+#[derive(Serialize)]
+struct CacheResponse {
+    success: bool,
+    message: String,
+}
+
+
+
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error>{
     const NUM_THREADS:i32 = 1;
@@ -55,8 +70,11 @@ async fn main() -> Result<(), sqlx::Error>{
         .route("/createchat", get(new_chat))
         .route("/newmessage/chatname/{chat}/username/{user}", post(incoming_message))
         .route("/getchat/chatname/{chat}", get(get_message_history))
-        .route(/getallusers/)
+        .route("/updatecache/:chat", post(update_cache))           // ← NEW
+        .route("/getcache/:chat", get(get_cache))                  // ← NEW
+        .route("/getallusers/", get(|| async { "TODO" }))          // ← fixed syntax
         .with_state(pool.clone());
+    
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
@@ -268,4 +286,78 @@ async fn login(State(pool): State<SqlitePool>, Path((username, password)): Path<
         println!("Username not found");
         return Json(Ok(String::from("Login error")));
     }
+}
+
+
+/// Checks if a username exists in the database
+/// # Query format:
+/// curl "http://127.0.0.1:3000/checkusername/UsernameString"
+async fn check_username(
+    Path(username): Path<String>,
+    State(pool): State<SqlitePool>
+) -> Json<Result<bool, String>> {
+    let exists = match sqlx::query!(
+        "SELECT id FROM users WHERE username = ?",
+        username
+    )
+    .fetch_optional(&pool)
+    .await
+    {
+        Ok(row) => row.is_some(),
+        Err(e) => {
+            println!("Database error checking username: {:?}", e);
+            return Json(Err("Database error".to_string()));
+        }
+    };
+
+    Json(Ok(exists))
+}
+
+async fn update_cache(
+    Path(chatname): Path<String>,
+    State(pool): State<SqlitePool>,
+    Json(update): Json<CacheUpdate>,
+) -> Result<Json<CacheResponse>, StatusCode> {
+    let chat_id = query!("SELECT id FROM chats WHERE name = ?", chatname)
+        .fetch_optional(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .ok_or(StatusCode::NOT_FOUND)?
+        .id;
+    
+    let json_history = serde_json::to_string(&update.messages)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    
+    query!(
+        "INSERT OR REPLACE INTO chat_history_cache (chat_id, message_history, updated_at) VALUES (?, ?, datetime('now'))",
+        chat_id, json_history
+    )
+    .execute(&pool).await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    
+    Ok(Json(CacheResponse {
+        success: true,
+        message: "Cache updated".to_string(),
+    }))
+}
+
+async fn get_cache(
+    Path(chatname): Path<String>,
+    State(pool): State<SqlitePool>,
+) -> Result<Json<Vec<ChatHistoryMessage>>, StatusCode> {
+    let chat_id = query!("SELECT id FROM chats WHERE name = ?", chatname)
+        .fetch_optional(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .ok_or(StatusCode::NOT_FOUND)?
+        .id;
+    
+    let json_history = query!("SELECT message_history FROM chat_history_cache WHERE chat_id = ?", chat_id)
+        .fetch_optional(&pool).await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .and_then(|row| row.message_history)
+        .unwrap_or_default();
+    
+    let messages: Vec<ChatHistoryMessage> = serde_json::from_str(&json_history)
+        .unwrap_or_default();
+    
+    Ok(Json(messages))
 }
