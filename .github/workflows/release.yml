@@ -17,15 +17,28 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: gui/src-tauri
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: gui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('gui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install frontend dependencies
         run: |
           cd gui
-          npm install
+          npm ci
 
       - name: Update Rust dependencies
         run: |
@@ -35,13 +48,24 @@ jobs:
       - name: Build macOS .dmg
         run: |
           cd gui
+          npm run build
           npm run tauri -- build --bundles dmg
 
+      - name: List build artifacts
+        if: always()
+        run: |
+          echo "=== DMG bundle ===" 
+          ls -lah gui/src-tauri/target/release/bundle/dmg/ 2>/dev/null || echo "DMG not found"
+          echo "=== macOS app bundle ==="
+          ls -lah gui/src-tauri/target/release/bundle/macos/ 2>/dev/null || echo "App bundle not found"
+          echo "=== All bundles ==="
+          find gui/src-tauri/target/release/bundle -type f 2>/dev/null | head -20
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: macos-artifacts
-          path: |
-            gui/src-tauri/target/release/bundle/dmg/*.dmg
+          path: gui/src-tauri/target/release/bundle/dmg/
 
   build-windows:
     runs-on: windows-latest
@@ -51,20 +75,32 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: gui/src-tauri
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: gui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('gui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install frontend dependencies
         run: |
           cd gui
-          npm install
+          npm ci
 
-      - name: Install NSIS and WiX
+      - name: Install NSIS
         run: |
           choco install nsis -y
-          choco install wixtoolset -y
 
       - name: Update Rust dependencies
         run: |
@@ -74,13 +110,22 @@ jobs:
       - name: Build Windows .exe
         run: |
           cd gui
+          npm run build
           npm run tauri -- build --bundles nsis
 
+      - name: List build artifacts
+        if: always()
+        run: |
+          echo "=== NSIS bundle ===" 
+          dir gui\src-tauri\target\release\bundle\nsis\ /b 2>$null || echo "NSIS not found"
+          echo "=== All bundles ==="
+          dir gui\src-tauri\target\release\bundle\ /s /b 2>$null | findstr /E "\.exe$|\.msi$" || echo "No executables found"
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: windows-artifacts
-          path: |
-            gui/src-tauri/target/release/bundle/nsis/*.exe
+          path: gui/src-tauri/target/release/bundle/nsis/
 
   build-linux:
     runs-on: ubuntu-latest
@@ -90,15 +135,28 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: gui/src-tauri
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: gui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('gui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install frontend dependencies
         run: |
           cd gui
-          npm install
+          npm ci
 
       - name: Install Linux dependencies
         run: |
@@ -118,25 +176,41 @@ jobs:
       - name: Build Linux packages
         run: |
           cd gui
+          npm run build
           npm run tauri -- build --bundles appimage,deb
 
+      - name: List build artifacts
+        if: always()
+        run: |
+          echo "=== AppImage bundle ===" 
+          ls -lah gui/src-tauri/target/release/bundle/appimage/ 2>/dev/null || echo "AppImage not found"
+          echo "=== DEB bundle ===" 
+          ls -lah gui/src-tauri/target/release/bundle/deb/ 2>/dev/null || echo "DEB not found"
+          echo "=== All bundles ==="
+          find gui/src-tauri/target/release/bundle -type f 2>/dev/null | head -20
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: linux-artifacts
-          path: |
-            gui/src-tauri/target/release/bundle/appimage/*.AppImage
-            gui/src-tauri/target/release/bundle/deb/*.deb
+          path: gui/src-tauri/target/release/bundle/
 
   create-release:
     runs-on: ubuntu-latest
     needs: [build-macos, build-windows, build-linux]
+    if: always()
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
+      - name: Display artifacts
+        run: |
+          find artifacts -type f -exec ls -lh {} \;
+
       - name: Create GitHub Release and upload binaries
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
