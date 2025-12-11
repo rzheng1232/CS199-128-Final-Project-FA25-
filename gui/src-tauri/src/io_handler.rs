@@ -6,6 +6,8 @@ use std::fs::read_dir;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
+use crate::HttpClient;
+use tauri::State;
 
 // user stuff
 #[derive(Clone, Hash)]
@@ -25,6 +27,13 @@ pub struct Message {
     pub user: String,
     pub message: String,
     pub timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ChatHistoryMessage {
+    pub username: String,
+    pub content: String,
+    pub created_at: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -63,91 +72,27 @@ fn read_chats_from_json(path: &str) -> Vec<Chat> {
 
 // save chat
 #[tauri::command]
-pub fn log_message(users: Vec<String>, user: String, message: String) -> Result<(), String> {
-    let chat_filename = chat_filename(&users);
-    let dir_path = "../app_data/cache";
-    let file_path = format!("{}/{}", dir_path, chat_filename);
-
-    create_dir_all(dir_path).map_err(|e| format!("Failed to create directory: {}", e))?;
-
-    let mut messages = read_messages_from_chat_json(&file_path);
-    messages.push(Message {
-        user,
-        message,
-        timestamp: Utc::now(),
-    });
-
-    let json = serde_json::to_string_pretty(&messages).map_err(|e| e.to_string())?;
-
-    let mut file = std::fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(&file_path)
-        .map_err(|e| e.to_string())?;
-
-    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
-
+pub async fn log_message(id: String, username: String, message: String, 
+    client: State<'_, HttpClient>,) -> Result<(), String> { // the terminal chat isn't showng up yes i tried it didnt wor
+    let url = format!("http://44.192.82.241/newmessage/chatname/{}/username/{}", id, username);
+    println!("{}", url); //have u sent anythign ok so obv this isnt running // might be a front end issue never calling this or somehting
+    let res = client.0.post(&url).header("Content-Type", "application/json").json(&serde_json::json!({ "content": message })).send().await.map_err(|e| e.to_string())?;
+    // println!("Response status: {}", res.status()); // yeah no references found of rl:Loloolo imma go searchog_message lolololo
+        
     Ok(())
 }
 
 #[tauri::command]
-pub fn get_chat_messages(id: String, users: Vec<String>) -> Result<Vec<Message>, String> {
-    let url = format!(
-        "http://44.192.82.241/getchat/chatname/ChatName",
-        user
-    );
-    let chat_filename = chat_filename(&users);
-    let file_path = format!("../app_data/cache/{}", chat_filename);
-    Ok(read_messages_from_chat_json(&file_path))
-}
-
-fn chat_filename(users: &[String]) -> String {
-    let mut sorted = users.to_vec(); // Fixed
-    sorted.sort();
-    format!("{}.json", sorted.join("_"))
-}
-
-#[tauri::command]
-pub fn print_messages(path: Option<String>) -> Result<Vec<Chat>, String> {
-    let path = path.unwrap_or_else(|| "../app_data/cache/chat_history.json".to_string());
-
-    let chats = read_chats_from_json(&path);
-
-    Ok(chats)
-}
-
-#[tauri::command]
-pub fn clear_messages(path: Option<String>) -> Result<(), String> {
-    let path = path.unwrap_or_else(|| "../app_data/cache/chat_history.json".to_string()); // Uses default if path doesn't exist -- will be fixed later just for testing now
-    let mut file = File::create(&path).map_err(|e| e.to_string())?;
-    file.write_all(b"[]").map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-// pub fn hash_name(name: &str) -> Jas {}
-
-impl<'a> UserList<'a> {
-    pub fn handle_join_message(&mut self, user_id: &'a str) {
-        let new_user = User {
-            id: user_id.to_string(),
-            password: " ".to_string(), // irrelevant here???
-        };
-        self.active_users.insert(user_id, new_user.clone());
-        println!("User {} joined.", new_user.id);
-    }
-
-    pub fn handle_leave_message(&mut self, user_id: &'a str) {
-        if self.active_users.remove(user_id).is_some() {
-            println!("User {} left.", user_id);
-        }
-    }
-
-    pub fn display_active_users(&self) {
-        println!("--- Active Users ---");
-        for user_id in self.active_users.keys() {
-            println!("- {}", user_id);
-        }
-        println!("--------------------");
-    }
+pub async fn print_messages(
+    id: String,
+    client: State<'_, HttpClient>,
+) -> Result<Vec<ChatHistoryMessage>, String> {
+    let url = format!("http://44.192.82.241/getchat/chatname/{}", id);
+    let messages:Vec<ChatHistoryMessage> = client.0.get(&url).send().await.map_err(|e| e.to_string())?.json::<Vec<ChatHistoryMessage>>().await.map_err(|e| e.to_string())?;
+    // wait can u just try compiling huh did 
+    ///lmk waht happens
+    /// // it compiled but no messages sent obvs still yerp well it could still be a frontend issue
+    /// Debugging time!!!
+    Ok(messages)
+    
 }

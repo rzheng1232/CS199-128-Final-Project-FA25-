@@ -12,9 +12,7 @@ fn main() {
         // to be added once list_chats is made in server
         .invoke_handler(tauri::generate_handler![
             io_handler::log_message,
-            io_handler::get_chat_messages,
             io_handler::print_messages,
-            io_handler::clear_messages,
             commands::login,
             commands::register,
             commands::list_chats,

@@ -92,36 +92,37 @@ function SideBar({
 
   return (
     <div className="flex flex-col bg-slate-900 text-slate-100 p-4 h-screen w-64 overflow-y-auto ">
+
       <h1 className="text-lg font-semibold mb-3 ">Chats</h1>
+      <div className="flex-1 overflow-y-auto px-4">
+        {chats.length === 0 && (
+          <p className="text-sm text-slate-400 mb-3">Start your first chat!</p>
+        )}
 
-      {chats.length === 0 && (
-        <p className="text-sm text-slate-400 mb-3">Start your first chat!</p>
-      )}
+        <ul className="list-none p-0 m-0 space-y-1">
+          {chats.map((chat) => {
+            const others = (chat.users || []).filter(u => u !== currentUser);
+            const label = others.join(", ");
 
-      <ul className="list-none p-0 m-0 space-y-1">
-        {chats.map((chat) => {
-          const others = (chat.users || []).filter(u => u !== currentUser);
-          const label = others.join(", ");
-
-          return (
-            <li key={chat.id}>
-              <button
-                type="button"
-                onClick={() => handleChatClick(chat.id)}
-                style={{ borderRadius: "6px" }}
-                className={
-                  activeChat === chat.id
-                    ? "w-full text-left bg-indigo-600 text-white px-2 py-2 text-sm hover:bg-indigo-500"
-                    : "w-full text-left text-slate-200 px-2 py-2 text-sm hover:bg-slate-600 hover:text-white"
-                }
-              >
-                {label || chat.id}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-
+            return (
+              <li key={chat.id}>
+                <button
+                  type="button"
+                  onClick={() => handleChatClick(chat.id)}
+                  style={{ borderRadius: "6px" }}
+                  className={
+                    activeChat === chat.id
+                      ? "w-full text-left bg-indigo-600 text-white px-2 py-2 text-sm hover:bg-indigo-500"
+                      : "w-full text-left text-slate-200 px-2 py-2 text-sm hover:bg-slate-600 hover:text-white"
+                  }
+                >
+                  {label || chat.id}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
 
       <form onSubmit={handleNewChat} className="mt-auto space-y-2">
