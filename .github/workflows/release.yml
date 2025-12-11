@@ -28,22 +28,18 @@ jobs:
           npm install
 
       - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-
-      - name: Install DMG bundler
-        run: brew install create-dmg
+        run: cd gui && npm install -g @tauri-apps/cli
 
       - name: Build macOS .dmg
         run: |
           cd gui
-          npx tauri build --bundle dmg
+          npm run tauri -- build --bundles dmg
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-artifacts
           path: |
             gui/src-tauri/target/release/bundle/dmg/*.dmg
-            gui/src-tauri/target/release/bundle/macos/*.app
 
   build-windows:
     runs-on: windows-latest
@@ -63,9 +59,6 @@ jobs:
           cd gui
           npm install
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-
       - name: Install NSIS and WiX
         run: |
           choco install nsis -y
@@ -74,13 +67,12 @@ jobs:
       - name: Build Windows .exe
         run: |
           cd gui
-          npx tauri build
+          npm run tauri -- build --bundles nsis
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
           path: |
-            gui/src-tauri/target/release/bundle/msi/*.msi
             gui/src-tauri/target/release/bundle/nsis/*.exe
 
   build-linux:
@@ -101,9 +93,6 @@ jobs:
           cd gui
           npm install
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
@@ -114,10 +103,10 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - name: Build Linux app
+      - name: Build Linux packages
         run: |
           cd gui
-          npx tauri build
+          npm run tauri -- build --bundles appimage,deb
 
       - uses: actions/upload-artifact@v4
         with:
@@ -125,7 +114,6 @@ jobs:
           path: |
             gui/src-tauri/target/release/bundle/appimage/*.AppImage
             gui/src-tauri/target/release/bundle/deb/*.deb
-            gui/src-tauri/target/release/bundle/rpm/*.rpm
 
   create-release:
     runs-on: ubuntu-latest
