@@ -10,18 +10,7 @@ Download the appropriate app our OS for and run it:
     - When you run the app, macOS will show you a warning.
     - Navigate to Settings -> Privacy & Security
     - Click "Open Anyway" near the "Illini.Chat was blocked from use" warning
-    - If this does not work, you can skip to Option 2 or use the terminal.
-    - In the terminal, run the following commands:
-      ```bash
-      sudo spctl --global-disable
-      sudo xattr -r -d com.apple.quarantine /Applications/Illini.Chat.app
-      ```
-    - Open Illini.Chat
-    - In the terminal, run the following command to re-enable Gatekeeper:
-      ```bash
-      sudo spctl --global-enable
-      ```
-    - If this does not work, use Option 2
+    - If this does not work, you should use Option 2
   - **Option 2** - Clone and build the app manually
     - Run the following commands in the terminal
       ```bash
