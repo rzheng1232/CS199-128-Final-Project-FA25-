@@ -27,8 +27,10 @@ jobs:
           cd gui
           npm install
 
-      - name: Install Tauri CLI
-        run: cd gui && npm install -g @tauri-apps/cli
+      - name: Update Rust dependencies
+        run: |
+          cd gui/src-tauri
+          cargo update
 
       - name: Build macOS .dmg
         run: |
@@ -63,6 +65,11 @@ jobs:
         run: |
           choco install nsis -y
           choco install wixtoolset -y
+
+      - name: Update Rust dependencies
+        run: |
+          cd gui/src-tauri
+          cargo update
 
       - name: Build Windows .exe
         run: |
@@ -102,6 +109,11 @@ jobs:
             libappindicator3-dev \
             librsvg2-dev \
             patchelf
+
+      - name: Update Rust dependencies
+        run: |
+          cd gui/src-tauri
+          cargo update
 
       - name: Build Linux packages
         run: |
