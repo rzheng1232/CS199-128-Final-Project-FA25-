@@ -5,6 +5,7 @@
 Download the appropriate app and run it.
 - .dmg for MacOS
 - .exe for Windows
+- .AppImage and .deb for Linux
 
 ## Creating an Account
 
