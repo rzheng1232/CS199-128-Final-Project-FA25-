@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
 type Props = {
@@ -7,8 +8,10 @@ type Props = {
 };
 
 function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
+  const [error, setError] = useState<string>("");
   async function tryLogin(e: React.FormEvent) {
     e.preventDefault();
+    setError(""); // clear old error
     const username = (
       document.getElementById("user") as HTMLInputElement
     ).value.trim();
@@ -22,7 +25,7 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
       if (result === 1) {
         onLoginSuccess(username);   // this is what flips you to ChatApp
       } else {
-        alert("Wrong username or password");
+        setError("Wrong username or password");
       }
     } catch (error) {
       console.error("Login call failed:", error);
@@ -37,7 +40,7 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl px-6 py-8">
         <h1 className="text-2xl font-semibold text-white text-center">
-          Chat Server
+          Illini.Chat
         </h1>
         <p className="mt-2 text-sm text-slate-400 text-center">
           Enter username and password
@@ -66,6 +69,12 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
               placeholder="Password"
             />
           </div>
+
+          {error && (
+            <div className="p-4 rounded-lg bg-red-500/50 border border-red-800 text-red-300 text-center text-sm font-medium">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

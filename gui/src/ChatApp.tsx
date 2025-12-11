@@ -13,7 +13,7 @@ type ChatInfo = {
   users: string[];
 };
 
-function ChatApp({ currentUser }: { currentUser: string }) {
+function ChatApp({ currentUser, onLogout }: { currentUser: string, onLogout: () => void }) {
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [chats, setChats] = useState<ChatInfo[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
@@ -29,7 +29,7 @@ function ChatApp({ currentUser }: { currentUser: string }) {
 
   useEffect(() => {
     refreshChats();
-    const id = setInterval(refreshChats, 1000);
+    const id = setInterval(refreshChats, 500);
     return () => clearInterval(id);
   }, [currentUser]);
 
@@ -96,6 +96,7 @@ function ChatApp({ currentUser }: { currentUser: string }) {
         onNewChat={handleNewChat}
         currentUser={currentUser}
         onNewChatDone={refreshChats}
+        onLogout={onLogout}
       />
       <div className="flex-grow-1 d-flex flex-column">
         <ChatWindow messages={messages} currentUser={currentUser} />

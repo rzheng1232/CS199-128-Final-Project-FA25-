@@ -71,8 +71,10 @@ pub async fn register(user: String, pass: String, client: State<'_, HttpClient>)
         Ok(r) => r.text().await.map_err(|e| e.to_string())?,
         Err(_) => return Ok(0),
     };
-
+    println!("{}", body);
     let v: serde_json::Value = serde_json::from_str(&body).unwrap();
+   
+    println!("{}", v);
     let n = v["Ok"].as_str().unwrap().parse::<i32>().unwrap();
 
     if n == 0{
@@ -103,7 +105,7 @@ pub async fn handleNewChat(currentUser: String, user: String, client: State<'_, 
     let n = v["Ok"].as_str().unwrap().parse::<i32>().unwrap();
 
     if n == 0{
-        return Ok(0)
+        return Ok(0);
     } else {
         let ChatName = format!("{}{}", currentUser, user);
         let url2 = format!(
@@ -151,27 +153,23 @@ pub async fn list_chats(
 
     Ok(chat_names)
 }
-// pub async fn list_chats (user: String, client: State<'_, HttpClient>) -> Result<Vec<String>, String> {
-//     let url = format!(
-//         "http://44.192.82.241/listchats/username/{}}",
-//         user
-//     );
-//     println!("{}", url);
-//     let resp = client.0.get(&url).send().await?
-//     .json::<ChatInfo>()  // parse JSON here
-//     .await?;
-// ;
 
-//     let body = match resp {
-//         Ok(r) => r.text().await.map_err(|e| e.to_string())?,
-//         Err(_) => return Ok(Vec::new()),
-//     };
-//     let mut chat_names: Vec<String> = Vec::new();
-//     for chat in body {
-//         chat_names.push(chat.id);
-//         println!("Chat id: {}", chat.id);
-//         println!("Users: {:?}", chat.users);
-//     }
-//     return Ok(chat_names);
+#[tauri::command]
+pub async fn delete_chat(user: String, id: String, client: State<'_, HttpClient>) -> Result<i32, String> {
+    let url = format!("http://44.192.82.241/deletechat/username/{}/chatname/{}", id, user);
+    println!("deleting {}", id);
+    
+    let resp = client.0.get(&url).send().await.map_err(|e| e.to_string())?;
+    let body = resp.text().await.map_err(|e| e.to_string())?;
 
-// }
+    let v = serde_json::from_str::<serde_json::Value>(&body)
+        .map_err(|e| format!("JSON parse error: {}", e))?;
+    
+    // Safe field access with defaults
+    let n = v.get("Ok")
+        .and_then(|ok| ok.as_str())
+        .and_then(|s| s.parse::<i32>().ok())
+        .unwrap_or(0);
+    
+    Ok(n)  // Returns 0 or 1 directly - no if needed
+}
