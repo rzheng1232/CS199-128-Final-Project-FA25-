@@ -29,7 +29,7 @@ function ChatApp({ currentUser }: { currentUser: string }) {
 
   useEffect(() => {
     refreshChats();
-    const id = setInterval(refreshChats, 1000);
+    const id = setInterval(refreshChats, 500);
     return () => clearInterval(id);
   }, [currentUser]);
 
