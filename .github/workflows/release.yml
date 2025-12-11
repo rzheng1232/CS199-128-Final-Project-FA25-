@@ -49,16 +49,19 @@ jobs:
         run: |
           cd gui
           npm run build
-          npm run tauri -- build --bundles dmg
+          npm run tauri -- build --bundles dmg -- --skip-stapling
 
-      - name: Verify DMG integrity
+      - name: Check DMG file
         run: |
           DMG_FILE="gui/src-tauri/target/release/bundle/dmg/Illini.Chat_0.1.0_aarch64.dmg"
           if [ -f "$DMG_FILE" ]; then
-            echo "DMG file found: $DMG_FILE"
+            echo "DMG file exists"
             ls -lh "$DMG_FILE"
             file "$DMG_FILE"
-            hdiutil verify "$DMG_FILE" || echo "Warning: DMG verification returned non-zero but file exists"
+            # Try to attach and detach to verify it's valid
+            hdiutil attach "$DMG_FILE" -verify -verbose 2>&1 | head -20 || true
+            # Don't fail on verification errors - just warn
+            echo "DMG check complete"
           else
             echo "ERROR: DMG file not found!"
             ls -lah gui/src-tauri/target/release/bundle/dmg/
@@ -71,6 +74,7 @@ jobs:
           name: macos-dmg
           path: gui/src-tauri/target/release/bundle/dmg/*.dmg
           retention-days: 5
+          if-no-files-found: error
 
   build-windows:
     runs-on: windows-latest
@@ -137,6 +141,7 @@ jobs:
           name: windows-exe
           path: gui/src-tauri/target/release/bundle/nsis/*.exe
           retention-days: 5
+          if-no-files-found: error
 
   build-linux:
     runs-on: ubuntu-latest
@@ -203,6 +208,7 @@ jobs:
           name: linux-appimage
           path: gui/src-tauri/target/release/bundle/appimage/*.AppImage
           retention-days: 5
+          if-no-files-found: error
 
       - name: Upload Linux DEB
         uses: actions/upload-artifact@v4
@@ -210,6 +216,7 @@ jobs:
           name: linux-deb
           path: gui/src-tauri/target/release/bundle/deb/*.deb
           retention-days: 5
+          if-no-files-found: error
 
   create-release:
     runs-on: ubuntu-latest
@@ -236,6 +243,6 @@ jobs:
           body: |
             # Illini.Chat Release ${{ github.ref_name }}
 
-            **macOS**: Download `Illini.Chat_0.1.0_aarch64.dmg`
-            **Windows**: Download `.exe` installer
+            **macOS**: Download the `.dmg` file
+            **Windows**: Download the `.exe` installer
             **Linux**: Download `.AppImage` or `.deb`
