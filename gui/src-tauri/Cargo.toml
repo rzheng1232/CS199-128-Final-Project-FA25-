@@ -22,7 +22,11 @@ tauri = { version = "2.0.0", features = [] }
 tauri-plugin-opener = "2.0.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-chat-server = {path = "../../../CS199-128-Final-Project-FA25-/chat-server"}
 chrono = { version = "0.4", features = ["serde"] }
 fs = "0.0.5"
-reqwest = "0.12.24"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+rand = "0.8"
+rsa = "0.8"
+sha2 = "0.10"
+argon2 = "0.4"
+chacha20poly1305 = { version = "0.10", features = ["alloc"] }

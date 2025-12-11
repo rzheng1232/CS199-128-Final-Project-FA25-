@@ -1,6 +1,9 @@
 use crate::HttpClient;
 use tauri::State;
 use serde::{Deserialize, Serialize};
+use rand::rngs::OsRng;
+use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
+use sha2::Sha256;
 
 #[derive(serde::Deserialize)]
 pub enum ApiResult {
@@ -54,8 +57,18 @@ pub async fn login(user: String, pass: String, client: State<'_, HttpClient>) ->
     }
 }
 
+fn generate_keys() -> (RsaPrivateKey, RsaPublicKey) {
+    let mut rng = OsRng;
+    let bits = 2048;
+    let priv_key = RsaPrivateKey::new(&mut rng, bits).expect("Key Generation");
+    let pub_key = RsaPublicKey::from(&priv_key);
+    (priv_key, pub_key)
+}
+
 #[tauri::command]
 pub async fn register(user: String, pass: String, client: State<'_, HttpClient>) -> Result<i32, String> {
+    let (privateKey, publicKey) = generate_keys();
+
     if user.trim().is_empty() || pass.trim().is_empty() {
         return Ok(0);
     }
