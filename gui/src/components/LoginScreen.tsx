@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
 type Props = {
@@ -7,8 +8,10 @@ type Props = {
 };
 
 function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
+  const [error, setError] = useState<string>("");
   async function tryLogin(e: React.FormEvent) {
     e.preventDefault();
+    setError(""); // clear old error
     const username = (
       document.getElementById("user") as HTMLInputElement
     ).value.trim();
@@ -22,7 +25,7 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
       if (result === 1) {
         onLoginSuccess(username);   // this is what flips you to ChatApp
       } else {
-        alert("Wrong username or password");
+        setError("Wrong username or password");
       }
     } catch (error) {
       console.error("Login call failed:", error);
@@ -66,6 +69,12 @@ function LoginScreen({ onLoginSuccess, onRegisterPress }: Props) {
               placeholder="Password"
             />
           </div>
+
+          {error && (
+            <div className="p-4 rounded-lg bg-red-500/50 border border-red-800 text-red-300 text-center text-sm font-medium">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
