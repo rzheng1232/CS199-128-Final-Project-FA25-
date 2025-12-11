@@ -85,7 +85,7 @@ pub async fn register(user: String, pass: String, client: State<'_, HttpClient>)
 }
 
 #[tauri::command]
-pub async fn handleNewChat(currentUser: String, user: String, client: State<'_, HttpClient>) -> Result<i32, String>{
+pub async fn handleNewChat(current_User: String, user: String, client: State<'_, HttpClient>) -> Result<i32, String>{
     if user.is_empty() {return Ok(0)}
 
     let url = format!(
@@ -107,10 +107,10 @@ pub async fn handleNewChat(currentUser: String, user: String, client: State<'_, 
     if n == 0{
         return Ok(0);
     } else {
-        let ChatName = format!("{}{}", currentUser, user);
+        let chatName = format!("{}{}", current_User, user);
         let url2 = format!(
             "http://44.192.82.241/createchat?name={}&user={}&user={}",
-            ChatName, user, currentUser
+            chatName, user, current_User
         );
         let resp2 = client.0.get(&url2).send().await;
 

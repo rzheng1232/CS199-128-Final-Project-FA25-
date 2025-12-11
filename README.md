@@ -1,8 +1,8 @@
-# CS199-128-Final-Project-FA25-
+# CS199-128-Final-Project-FA25- Illini.Chat
 
 ## Run Instructions
 
-Find detailed ryb instructions in the [Run Instructions](RUN.md).
+Find detailed run instructions in the [Run Instructions](RUN.md).
 
 ## Group Name
 
