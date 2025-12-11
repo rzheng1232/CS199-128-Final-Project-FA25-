@@ -16,6 +16,7 @@ fn main() {
             commands::login,
             commands::register,
             commands::list_chats,
+            commands::delete_chat,
             commands::handleNewChat
         ])
         .run(tauri::generate_context!())

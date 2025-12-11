@@ -30,9 +30,9 @@ function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
         setError("Username already taken");
         return;
       }
-      else {
-        onRegisterSuccess(username);
-      }
+
+      onRegisterSuccess(username);
+
     } catch (error) {
       console.error("Register call failed:", error);
       alert("Register error (backend unreachable)");
@@ -43,7 +43,7 @@ function RegisterScreen({ onRegisterSuccess, onLoginPress }: Props) {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl px-6 py-8">
         <h1 className="text-2xl font-semibold text-white text-center">
-          Chat Server
+          Illini.Chat
         </h1>
         <p className="mt-2 text-sm text-slate-400 text-center">
           Enter username and password
