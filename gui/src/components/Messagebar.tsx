@@ -13,11 +13,13 @@ function Messagebar({ onSend, activeChat }: MessageBarProps): JSX.Element | null
   };
 
   const handleSend = (e: React.FormEvent) => {
+
     e.preventDefault();
     if (text.trim()) {
       onSend(text.trim());
       setText("");
     }
+
   };
 
   if(!activeChat) {
