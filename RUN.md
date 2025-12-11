@@ -4,11 +4,11 @@
 
 Download the appropriate app and run it:
 
-- **macOS**: [Download `.dmg`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/download/v0.1.0/Illini.Chat_0.1.0_aarch64.dmg)  
-- **Windows**: [Download `.exe`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/download/v0.1.0/Illini.Chat_0.1.0_x64-setup.exe)  
+- **macOS**: [Download `.dmg`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/latest/download/Illini.Chat_0.1.0_aarch64.dmg)  
+- **Windows**: [Download `.exe`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/latest/download/Illini.Chat_0.1.0_x64-setup.exe)  
 - **Linux**:  
-  - [Download `.AppImage`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/download/v0.1.0/Illini.Chat_0.1.0_amd64.AppImage)  
-  - [Download `.deb`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/download/v0.1.0/Illini.Chat_0.1.0_amd64.deb)  
+  - [Download `.AppImage`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/latest/download/Illini.Chat_0.1.0_amd64.AppImage)  
+  - [Download `.deb`](https://github.com/rzheng1232/CS199-128-Final-Project-FA25-/releases/latest/download/Illini.Chat_0.1.0_amd64.deb)  
 
 ---
 
