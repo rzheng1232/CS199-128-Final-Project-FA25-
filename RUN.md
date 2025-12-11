@@ -2,7 +2,7 @@
 
 ## Downloading the App
 
-Download the appropriate app our OS for yand run it:
+Download the appropriate app our OS for and run it:
 
 - **macOS**: Since this build is not signed or notarized, there are two options to run the app. Option 2 will probably be easier for most users but requires installing the source code.
   - **Option 1** - Allow the downloaded app to run
