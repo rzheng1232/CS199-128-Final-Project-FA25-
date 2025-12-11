@@ -49,7 +49,7 @@ jobs:
         run: |
           cd gui
           npm run build
-          npm run tauri -- build --bundles dmg -- --skip-stapling
+          npm run tauri -- build --bundles dmg --skip-stapling
 
       - name: Check DMG file
         run: |
