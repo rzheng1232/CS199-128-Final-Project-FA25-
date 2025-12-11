@@ -37,7 +37,10 @@ function App() {
     );
   }
 
-  return <ChatApp currentUser={currentUser} />;
+  return (<ChatApp
+      currentUser={currentUser}
+      onLogout={() => setCurrentUser(null)}
+    />);
 }
 
 export default App;

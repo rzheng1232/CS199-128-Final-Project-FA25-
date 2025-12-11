@@ -9,10 +9,11 @@ type SideBarProps = {
   onNewChat: (username: string) => void;
   currentUser: string;
   onNewChatDone: () => void;
+  onLogout: () => void;
 };
 
 type ChatInfo = {
-  id: string;     // "alice_bob"
+  id: string; // "alice_bob"
   users: string[]; // ["alice", "bob"]
 };
 
@@ -20,9 +21,10 @@ function SideBar({
   chats,
   activeChat,
   handleChatClick,
-  onNewChat,
+//  onNewChat,
   currentUser,
-  onNewChatDone
+  onNewChatDone,
+  onLogout,
 }: SideBarProps): JSX.Element {
   const [username, setUsername] = useState("");
 
@@ -71,7 +73,7 @@ function SideBar({
     try {
       const result = await invoke<number>("handleNewChat", {
         currentUser,
-        user: trimmedUsername
+        user: trimmedUsername,
       });
       console.log("handleNewChat result:", result);
 
@@ -87,13 +89,18 @@ function SideBar({
     }
   };
 
-
-
-
   return (
     <div className="flex flex-col bg-slate-900 text-slate-100 p-4 h-screen w-64 overflow-y-auto ">
-
-      <h1 className="text-lg font-semibold mb-3 ">Chats</h1>
+      <div className="flex items-center gap-4 mb-3">
+        <h1 className="text-lg font-semibold">Chats</h1>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="px-3 py-1 text-xs font-semibold bg-red-600 text-white rounded-pill hover:bg-red-500 active:bg-red-700 transition"
+        >
+          Logout
+        </button>
+      </div>
       <div className="flex-1 overflow-y-auto px-4">
         {chats.length === 0 && (
           <p className="text-sm text-slate-400 mb-3">Start your first chat!</p>
@@ -101,7 +108,7 @@ function SideBar({
 
         <ul className="list-none p-0 m-0 space-y-1">
           {chats.map((chat) => {
-            const others = (chat.users || []).filter(u => u !== currentUser);
+            const others = (chat.users || []).filter((u) => u !== currentUser);
             const label = others.join(", ");
 
             return (
@@ -123,7 +130,6 @@ function SideBar({
           })}
         </ul>
       </div>
-
 
       <form onSubmit={handleNewChat} className="mt-auto space-y-2">
         <div className="flex flex-col gap-2">
