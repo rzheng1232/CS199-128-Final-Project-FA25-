@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  actions: read
 
 jobs:
   build-macos:
@@ -15,13 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/setup-node@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install frontend deps
+      - name: Install frontend dependencies
         run: |
           cd gui
           npm install
@@ -29,10 +30,13 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
 
-      - name: Build macOS app
+      - name: Install DMG bundler
+        run: brew install create-dmg
+
+      - name: Build macOS .dmg
         run: |
           cd gui
-          npm run tauri build
+          npx tauri build --bundle dmg
 
       - uses: actions/upload-artifact@v4
         with:
@@ -46,21 +50,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/setup-node@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: |
+      - name: Install frontend dependencies
+        run: |
           cd gui
           npm install
 
-      - run: npm install -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
 
-      - run: |
+      - name: Install NSIS and WiX
+        run: |
+          choco install nsis -y
+          choco install wixtoolset -y
+
+      - name: Build Windows .exe
+        run: |
           cd gui
-          npm run tauri build
+          npx tauri build
 
       - uses: actions/upload-artifact@v4
         with:
@@ -74,19 +88,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/setup-node@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: |
+      - name: Install frontend dependencies
+        run: |
           cd gui
           npm install
 
-      - run: npm install -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
 
-      - name: Install Linux deps
+      - name: Install Linux dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -96,9 +114,10 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - run: |
+      - name: Build Linux app
+        run: |
           cd gui
-          npm run tauri build
+          npx tauri build
 
       - uses: actions/upload-artifact@v4
         with:
@@ -116,7 +135,7 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release and upload binaries
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
