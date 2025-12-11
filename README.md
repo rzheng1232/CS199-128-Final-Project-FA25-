@@ -1,4 +1,4 @@
-# CS199-128-Final-Project-FA25-
+# CS199-128-Final-Project-FA25- Illini.Chat
 
 ## Run Instructions
 
