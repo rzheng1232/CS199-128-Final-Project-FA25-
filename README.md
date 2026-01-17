@@ -2,7 +2,7 @@
 
 ## Run Instructions
 
-Find detailed run instructions in the [Run Instructions](RUN.md).
+Find detailed run instructions in the [Run Instructions](RUN.md). **THE SERVER IS NOT CURRENTLY RUNNING**
 
 ## Group Name
 
